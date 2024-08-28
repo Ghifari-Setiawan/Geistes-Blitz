@@ -196,11 +196,11 @@ RED = (255, 0, 0)
 def create_items():
     item_positions = [(100, 400), (250, 400), (400, 400), (550, 400), (700, 400)]
     items = [
-        Item('Ghost', WHITE, 'ghost.png', item_positions[0]),
-        Item('Book', BLUE, 'book.png', item_positions[1]),
-        Item('Bottle', GREEN, 'bottle.png', item_positions[2]),
-        Item('Mouse', GRAY, 'mouse.png', item_positions[3]),
-        Item('Sofa', RED, 'sofa.png', item_positions[4]),
+        Item('Ghost', WHITE, 'assets/setan.png', item_positions[0]),
+        Item('Book', BLUE, 'assets/buku.png', item_positions[1]),
+        Item('Bottle', GREEN, 'assets/botol.png', item_positions[2]),
+        Item('Mouse', GRAY, 'assets/tikus.png', item_positions[3]),
+        Item('Sofa', RED, 'assets/sofa.png', item_positions[4]),
     ]
     return items
 
