@@ -100,22 +100,27 @@ def popup_cara_bermain():
         "4. Pilihan yang benar mendapatkan poin, yang salah tidak.",
         "5. Permainan berakhir saat semua kartu digunakan."
     ]
-    
-    # Latar belakang popup
-    popup_rect = pygame.Rect(100, 100, 600, 400)
+
+    # Atur ukuran dan posisi popup
+    popup_width, popup_height = 750, 350
+    popup_x = (screen_width - popup_width) // 2
+    popup_y = (screen_height - popup_height) // 2
+    popup_rect = pygame.Rect(popup_x, popup_y, popup_width, popup_height)
+
+    # Gambar latar belakang popup
     pygame.draw.rect(screen, ABU_ABU, popup_rect)
-    
+
     # Gambar teks instruksi
     for i, line in enumerate(instruksi):
         teks_instruksi = button_font.render(line, True, HITAM)
-        screen.blit(teks_instruksi, (popup_rect.x + 20, popup_rect.y + 20 + i * 40))
-    
+        screen.blit(teks_instruksi, (popup_x + 20, popup_y + 20 + i * 30))
+
     # Gambar tombol tutup
-    tombol_tutup = Tombol('Tutup', (350, 450), (100, 50))
+    tombol_tutup = Tombol('Tutup', (popup_x + popup_width // 2 - 50, popup_y + popup_height - 60), (100, 40))
     tombol_tutup.draw(screen)
-    
+
     pygame.display.flip()
-    
+
     # Loop event untuk popup
     while True:
         for event in pygame.event.get():
@@ -132,8 +137,6 @@ def layar_cara_bermain():
     popup_cara_bermain()  # Panggil fungsi popup
     layar_awal()  # Kembali ke layar awal setelah menutup popup
 
-def draw_game_screen(current_card, items, players):
-    screen.fill(PUTIH)
 
     # Gambar kartu saat ini di tengah
     screen.blit(current_card.image, (screen_width // 2 - current_card.rect.width // 2, screen_height // 3))
