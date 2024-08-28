@@ -160,11 +160,17 @@ def draw_game_screen(current_card, items, players):
 
     # Position settings based on the number of players
     player_positions = [
-        {'score_pos': (screen_width // 2, screen_height - 50), 'item_pos': (screen_width // 2 - 200, screen_height - 100), 'rotation': 0},  # Bottom (Player 1)
-        {'score_pos': (screen_width // 2, 50), 'item_pos': (screen_width // 2 - 200, 100), 'rotation': 180},  # Top (Player 2)
-        {'score_pos': (50, screen_height // 2), 'item_pos': (100, screen_height // 2 - 200), 'rotation': 90},  # Left (Player 3)
-        {'score_pos': (screen_width - 50, screen_height // 2), 'item_pos': (screen_width - 100, screen_height // 2 - 200), 'rotation': 270},  # Right (Player 4)
+        {'score_pos': (screen_width // 2, screen_height - 50), 'item_pos': (screen_width // 2 - 150, screen_height - 150), 'rotation': 0},  # Bottom (Player 1)
+        {'score_pos': (screen_width // 2, 50), 'item_pos': (screen_width // 2 - 150, 100), 'rotation': 180},  # Top (Player 2)
+        {'score_pos': (50, screen_height // 2), 'item_pos': (100, screen_height // 2 - 150), 'rotation': 90},  # Left (Player 3)
+        {'score_pos': (screen_width - 50, screen_height // 2), 'item_pos': (screen_width - 150, screen_height // 2 - 150), 'rotation': 270},  # Right (Player 4)
     ]
+
+    # Scaling down items if necessary
+    scaled_items = []
+    for item in items:
+        scaled_item_image = pygame.transform.scale(item.image, (80, 80))  # Scale to fit better
+        scaled_items.append(scaled_item_image)
 
     # Draw player items and scores
     for i, player in enumerate(players):
@@ -175,10 +181,10 @@ def draw_game_screen(current_card, items, players):
         screen.blit(rotated_score_text, rotated_score_text.get_rect(center=pos['score_pos']))
 
         # Draw items
-        for j, item in enumerate(items):
-            item_image = pygame.transform.rotate(item.image, pos['rotation'])
+        for j, item_image in enumerate(scaled_items):
             item_rect = item_image.get_rect(topleft=(pos['item_pos'][0] + j * 100, pos['item_pos'][1]))
-            screen.blit(item_image, item_rect)
+            rotated_item_image = pygame.transform.rotate(item_image, pos['rotation'])
+            screen.blit(rotated_item_image, item_rect)
 
     pygame.display.flip()
 
