@@ -44,7 +44,6 @@ class Button:
                 return True
         return False
 
-
 def title_screen():
     start_button = Button('Start', (300, 150), (200, 50))
     how_to_play_button = Button('How To Play', (300, 250), (200, 50))
@@ -66,71 +65,6 @@ def title_screen():
         how_to_play_button.draw(screen)
         pygame.display.flip()
 
-
-def game_screen(num_players):
-    
-    pygame.init()
-
-    # Screen dimensions
-    screen_width, screen_height = 800, 600
-    screen = pygame.display.set_mode((screen_width, screen_height))
-    pygame.display.set_caption("Geistes Blitz")
-
-    # Colors
-    WHITE = (255, 255, 255)
-    GRAY = (200, 200, 200)
-    BLACK = (0, 0, 0)
-
-    # Font
-    font = pygame.font.SysFont(None, 40)
-
-    # Player data (using num_players to initialize the correct number of players)
-    players = [{'name': f'Player {i+1}', 'score': 0} for i in range(num_players)]
-
-    def draw_game_screen(current_card, items):
-        screen.fill(WHITE)
-
-        # Draw the current card in the center
-        screen.blit(current_card.image, (screen_width // 2 - current_card.rect.width // 2, screen_height // 3))
-
-        # Draw item options for selection
-        for item in items:
-            screen.blit(item.image, item.rect.topleft)
-
-        # Draw player scores (only for the number of active players)
-        for i, player in enumerate(players):
-            player_score_text = font.render(f"{player['name']}: {player['score']} pts", True, BLACK)
-            screen.blit(player_score_text, (20, 20 + i * 40))
-
-        pygame.display.flip()
-
-    def game_loop():
-        # Initialize items and cards
-        items = create_items()
-        cards = create_cards()
-
-        current_card = random.choice(cards)  # Draw the first card
-
-        running = True
-        while running:
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    running = False
-
-                # Handle item selection
-                if event.type == pygame.MOUSEBUTTONDOWN:
-                    for item in items:
-                        if item.rect.collidepoint(event.pos):
-                            handle_item_selection(item, current_card)
-
-            draw_game_screen(current_card, items)
-
-        pygame.quit()
-
-    # Call the game loop to start the game
-    game_loop()
-
-
 def select_player_screen():
     player2_button = Button('2 Player', (300, 150), (200, 50))
     player3_button = Button('3 Player', (300, 250), (200, 50))
@@ -144,11 +78,11 @@ def select_player_screen():
                 sys.exit()
 
             if player2_button.handle_event(event):
-                game_screen(2)
+                game_loop(2)
             if player3_button.handle_event(event):
-                game_screen(3)
+                game_loop(3)
             if player4_button.handle_event(event):
-                game_screen(4)
+                game_loop(4)
 
         screen.fill(WHITE)
         player2_button.draw(screen)
@@ -156,11 +90,8 @@ def select_player_screen():
         player4_button.draw(screen)
         pygame.display.flip()
 
-
 def how_to_play_screen():
     skip_button = Button('Skip', (screen_width - 120, screen_height - 70), (100, 50))
-    
-    # Load or render video here if needed (omitted for simplicity)
     
     watching = True
     while watching:
@@ -174,9 +105,25 @@ def how_to_play_screen():
                 title_screen()
 
         screen.fill(WHITE)
-        # Display instructions or video here
         skip_button.draw(screen)
         pygame.display.flip()
+
+def draw_game_screen(current_card, items, players):
+    screen.fill(WHITE)
+
+    # Draw the current card in the center
+    screen.blit(current_card.image, (screen_width // 2 - current_card.rect.width // 2, screen_height // 3))
+
+    # Draw item options for selection
+    for item in items:
+        screen.blit(item.image, item.rect.topleft)
+
+    # Draw player scores (only for the number of active players)
+    for i, player in enumerate(players):
+        player_score_text = font.render(f"{player['name']}: {player['score']} pts", True, BLACK)
+        screen.blit(player_score_text, (20, 20 + i * 40))
+
+    pygame.display.flip()
 
 class Item(pygame.sprite.Sprite):
     def __init__(self, name, color, image_path, pos):
@@ -204,22 +151,6 @@ def create_items():
     ]
     return items
 
-def handle_item_selection(selected_item, current_card):
-    # Example of selection logic based on card level
-    if current_card.level == 1:
-        if selected_item.name == current_card.correct_item:
-            print("Correct!")
-            # Update score and proceed to the next card
-        else:
-            print("Incorrect!")
-    elif current_card.level == 2:
-        if selected_item.name != current_card.incorrect_item:
-            print("Correct!")
-            # Update score and proceed to the next card
-        else:
-            print("Incorrect!")
-
-
 class Card(pygame.sprite.Sprite):
     def __init__(self, image_path, correct_item, incorrect_item, level):
         super().__init__()
@@ -228,50 +159,80 @@ class Card(pygame.sprite.Sprite):
         self.correct_item = correct_item
         self.incorrect_item = incorrect_item
         self.level = level
+        self.used = False  # Track if the card is used
 
 def create_cards():
     cards = [
-        Card('card1.png', 'Ghost', None, 1),
-        Card('card2.png', 'Book', None, 1),
-        Card('card3.png', None, 'Bottle', 2),
-        Card('card4.png', None, 'Mouse', 2),
-        # Add more cards as needed
+        Card('assets/level1/card1.jpg', 'Ghost', None, 1),
+        Card('assets/level1/card2.jpg', 'Book', None, 1),
+        Card('assets/level2/card13.jpg', None, 'Bottle', 2),
+        Card('assets/level2/card14.jpg', None, 'Mouse', 2),
     ]
     return cards
 
+def display_scores(players):
+    # Placeholder function to display the final scores
+    print("Final Scores:")
+    for player in players:
+        print(f"{player['name']}: {player['score']} pts")
 
-# Create buttons
-start_button = Button('Start', (300, 150), (200, 50))
-how_to_play_button = Button('How To Play', (300, 250), (200, 50))
+def handle_item_selection(selected_item, current_card, players, current_player_index, cards):
+    # Check the current card's level and validate the selection
+    if current_card.level == 1:
+        if selected_item.name == current_card.correct_item:
+            players[current_player_index]['score'] += 1
+            print(f"{players[current_player_index]['name']} selected the correct item!")
+        else:
+            print(f"{players[current_player_index]['name']} selected the wrong item!")
+    elif current_card.level == 2:
+        if selected_item.name != current_card.incorrect_item:
+            players[current_player_index]['score'] += 1
+            print(f"{players[current_player_index]['name']} selected the correct item!")
+        else:
+            print(f"{players[current_player_index]['name']} selected the wrong item!")
 
-# Game loop flag
-running = True
+    # Proceed to the next round or end the game if out of cards
+    next_card = next((card for card in cards if not card.used), None)
+    if next_card:
+        current_card = next_card
+        current_card.used = True
+    else:
+        print("Game Over!")
+        display_scores(players)
+        pygame.quit()
+        sys.exit()
+
+    # Return the updated current card
+    return current_card
+
+def game_loop(num_players):
+    # Initialize items and cards
+    items = create_items()
+    cards = create_cards()
+
+    # Initialize player data based on the number of players
+    players = [{'name': f'Player {i+1}', 'score': 0} for i in range(num_players)]
+
+    current_card = random.choice(cards)  # Draw the first card
+    current_card.used = True  # Mark card as used
+    current_player_index = 0  # Start with the first player
+
+    running = True
+    while running:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+
+            # Handle item selection
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                for item in items:
+                    if item.rect.collidepoint(event.pos):
+                        current_card = handle_item_selection(item, current_card, players, current_player_index, cards)
+                        current_player_index = (current_player_index + 1) % num_players  # Move to the next player
+
+        draw_game_screen(current_card, items, players)  # Pass the players list to the draw function
+
+    pygame.quit()
 
 # Main loop
-while running:
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            running = False
-
-        # Handle button clicks
-        if start_button.handle_event(event):
-            print("Start Game Clicked")
-            select_player_screen()
-
-        if how_to_play_button.handle_event(event):
-            print("How To Play Clicked")
-            how_to_play_screen()
-
-    # Clear screen
-    screen.fill(WHITE)
-
-    # Draw UI elements
-    start_button.draw(screen)
-    how_to_play_button.draw(screen)
-
-    # Update display
-    pygame.display.flip()
-
-# Quit pygame
-pygame.quit()
-sys.exit()
+title_screen()
