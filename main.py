@@ -160,10 +160,10 @@ def draw_game_screen(current_card, items, players):
 
     # Position settings based on the number of players
     player_positions = [
-        {'score_pos': (screen_width // 2, screen_height - 50), 'item_pos': (screen_width // 2 - 150, screen_height - 150), 'rotation': 0},  # Bottom (Player 1)
-        {'score_pos': (screen_width // 2, 50), 'item_pos': (screen_width // 2 - 150, 100), 'rotation': 180},  # Top (Player 2)
-        {'score_pos': (50, screen_height // 2), 'item_pos': (100, screen_height // 2 - 150), 'rotation': 90},  # Left (Player 3)
-        {'score_pos': (screen_width - 50, screen_height // 2), 'item_pos': (screen_width - 150, screen_height // 2 - 150), 'rotation': 270},  # Right (Player 4)
+    {'score_pos': (screen_width // 2, screen_height - 50), 'item_pos': (screen_width // 2 - 150, screen_height - 150), 'rotation': 0},  # Bottom (Player 1)
+    {'score_pos': (screen_width // 2, 50), 'item_pos': (screen_width // 2 - 150, 100), 'rotation': 180},  # Top (Player 2)
+    {'score_pos': (50, screen_height // 2), 'item_pos': (100, screen_height // 2 - 100), 'rotation': 270},  # Left (Player 3) 
+    {'score_pos': (screen_width - 50, screen_height // 2), 'item_pos': (screen_width - 150, screen_height // 2 - 100), 'rotation': -270},  # Right (Player 4)
     ]
 
     # Scaling down items if necessary
