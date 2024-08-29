@@ -176,7 +176,7 @@ def draw_game_screen(current_card, items, players):
     for i, player in enumerate(players):
         pos = player_positions[i]
         # Draw score
-        score_text = font.render(f"{player['name']}: {player['score']} pts", True, BLACK)
+        score_text = font.render(f"{player['name']}: {player['score']} poin", True, BLACK)
         rotated_score_text = pygame.transform.rotate(score_text, pos['rotation'])
         screen.blit(rotated_score_text, rotated_score_text.get_rect(center=pos['score_pos']))
 
@@ -232,7 +232,7 @@ def display_scores(players):
     # Placeholder function to display final scores
     print("Final Scores:")
     for player in players:
-        print(f"{player['name']}: {player['score']} pts")
+        print(f"{player['name']}: {player['score']} poin")
 
 def handle_item_selection(selected_item, current_card, players, current_player_index, cards):
     # Check current card level and validate selection
