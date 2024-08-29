@@ -54,8 +54,8 @@ def start_screen():
 
     pygame.init()
 
-    start_button = Button('Start', (300, 150), (200, 50))
-    instructions_button = Button('How To Play', (300, 250), (200, 50))
+    start_button = Button('Start', (520, 250), (200, 50))
+    instructions_button = Button('How To Play', (520, 350), (200, 50))
 
     running = True
     while running:
@@ -78,9 +78,9 @@ def player_selection_screen():
 
     pygame.init()
 
-    two_players_button = Button('2 Players', (300, 150), (200, 50))
-    three_players_button = Button('3 Players', (300, 250), (200, 50))
-    four_players_button = Button('4 Players', (300, 350), (200, 50))
+    two_players_button = Button('2 Players', (520, 200), (200, 50))
+    three_players_button = Button('3 Players', (520, 300), (200, 50))
+    four_players_button = Button('4 Players', (520, 400), (200, 50))
 
     selecting = True
     while selecting:
