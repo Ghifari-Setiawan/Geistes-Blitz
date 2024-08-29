@@ -221,10 +221,10 @@ class Card(pygame.sprite.Sprite):
 
 def create_cards():
     cards = [
-        Card('assets/level1/card1.jpg', 'Ghost', None, 1),
-        Card('assets/level1/card2.jpg', 'Book', None, 1),
-        Card('assets/level2/card13.jpg', None, 'Bottle', 2),
-        Card('assets/level2/card14.jpg', None, 'Mouse', 2),
+        Card('assets/level1/card1.jpg', 'Sofa', None, 1),
+        Card('assets/level1/card2.jpg', 'Ghost', None, 1),
+        Card('assets/level2/card13.jpg', None, 'Sofa', 2),
+        Card('assets/level2/card14.jpg', None, 'Sofa', 2),
     ]
     return cards
 
