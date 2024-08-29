@@ -54,7 +54,7 @@ def start_screen():
 
     pygame.init()
 
-    start_button = Button('Start', (520, 250), (200, 50))
+    start_button = Button('Start', (560, 250), (110, 50))
     instructions_button = Button('How To Play', (520, 350), (200, 50))
 
     running = True
