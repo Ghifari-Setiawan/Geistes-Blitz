@@ -211,7 +211,8 @@ def create_items():
 class Card(pygame.sprite.Sprite):
     def __init__(self, image_path, correct_item, incorrect_item, level):
         super().__init__()
-        self.image = pygame.image.load(image_path).convert_alpha()
+        original_image = pygame.image.load(image_path).convert_alpha()
+        self.image = pygame.transform.scale(original_image, (200, 300))  # Ubah ukuran gambar kartu
         self.rect = self.image.get_rect(center=(screen_width // 2, screen_height // 3))
         self.correct_item = correct_item
         self.incorrect_item = incorrect_item
