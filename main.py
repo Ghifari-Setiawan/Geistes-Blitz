@@ -169,8 +169,8 @@ def draw_game_screen(current_card, items, players):
     player_positions = [
         {'score_pos': (screen_width // 2, screen_height - 30), 'item_pos': [(screen_width // 2 - 200 + i * 80, screen_height // 2 + 180) for i in range(5)]},  # Bottom (Player 1)
         {'score_pos': (screen_width // 2, 30), 'item_pos': [(screen_width // 2 - 200 + i * 100, 100) for i in range(5)]},  # Top (Player 2)
-        {'score_pos': (30, screen_height // 2), 'item_pos': [(100, screen_height // 2 - 200 + i * 80) for i in range(5)], 'vertical': True, 'facing_right': True},  # Left (Player 3)
-        {'score_pos': (screen_width - 30, screen_height // 2), 'item_pos': [(screen_width - 150, screen_height // 2 - 200 + i * 100) for i in range(5)], 'vertical': True, 'facing_left': True},  # Right (Player 4)
+        {'score_pos': (30, screen_height // 2 + 170), 'item_pos': [(100, screen_height // 2 - 200 + i * 80) for i in range(5)], 'vertical': True, 'facing_right': True},  # Left (Player 3)
+        {'score_pos': (screen_width - 30, screen_height // 2 + 170), 'item_pos': [(screen_width - 150, screen_height // 2 - 200 + i * 100) for i in range(5)], 'vertical': True, 'facing_left': True},  # Right (Player 4)
     ]
 
     # Scaling down items if necessary
@@ -188,7 +188,11 @@ def draw_game_screen(current_card, items, players):
 
         if 'vertical' in pos:
             score_text = pygame.transform.rotate(score_text, 90)
-            screen.blit(score_text, score_text.get_rect(center=pos['score_pos']))
+            if 'facing_right' in pos:
+                score_text = pygame.transform.rotate(score_text, 180)
+            elif 'facing_left' in pos: 
+                score_text = pygame.transform.rotate(score_text, 0)
+            screen.blit(score_text, score_text.get_rect(center=(pos['score_pos'][0], pos['score_pos'][1] - 150)))
         else:
             screen.blit(score_text, score_text.get_rect(center=pos['score_pos']))
 
