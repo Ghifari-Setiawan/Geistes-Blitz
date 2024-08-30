@@ -182,10 +182,7 @@ def draw_game_screen(current_card, items, players):
         pos = player_positions[i]
         
         # Draw score
-        score_text = font.render(f"{player['name']}: {player['score']} poin", True, BLACK)
-        rotated_score_text = pygame.transform.rotate(score_text, pos['rotation'])
-        screen.blit(rotated_score_text, rotated_score_text.get_rect(center=pos['score_pos']))
-         score_text = font.render(f"{player['name']}: {player['score']} pts", True, BLACK)
+        score_text = font.render(f"{player['name']}: {player['score']} pts", True, BLACK)
         
         # Rotate the score text for vertical players
         if 'vertical' in pos:
@@ -197,7 +194,6 @@ def draw_game_screen(current_card, items, players):
             screen.blit(score_text, score_text.get_rect(center=(pos['score_pos'][0], pos['score_pos'][1] - 150)))
         else:
             screen.blit(score_text, score_text.get_rect(center=pos['score_pos']))
-
 
         # Draw items
         for j, item_image in enumerate(scaled_items):
@@ -211,7 +207,7 @@ def draw_game_screen(current_card, items, players):
             
             screen.blit(item_image, item_rect)
 
-pygame.display.flip()
+    pygame.display.flip()
 
 
 
@@ -258,7 +254,7 @@ def display_scores(players):
     # Placeholder function to display final scores
     print("Final Scores:")
     for player in players:
-        print(f"{player['name']}: {player['score']} poin")
+        print(f"{player['name']}: {player['score']} pts")
 
 def handle_item_selection(selected_item, current_card, players, current_player_index, cards):
     # Check current card level and validate selection
