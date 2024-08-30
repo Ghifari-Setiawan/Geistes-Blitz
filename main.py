@@ -155,9 +155,7 @@ def instructions_screen():
 
 
 def draw_game_screen(current_card, items, players):
-
     pygame.init()
-
     screen.fill(WHITE)
 
     # Draw the current card in the center
@@ -165,10 +163,10 @@ def draw_game_screen(current_card, items, players):
 
     # Position settings for players
     player_positions = [
-        {'score_pos': (screen_width // 2, screen_height - 50), 'item_pos': [(screen_width // 2 - 200 + i * 80, screen_height // 2 + 180) for i in range(5)]},  # Bottom (Player 1)
-        {'score_pos': (screen_width // 2, 50), 'item_pos': [(screen_width // 2 - 200 + i * 80, 100) for i in range(5)]},  # Top (Player 2)
-        {'score_pos': (50, screen_height // 2), 'item_pos': [(100, screen_height // 2 - 150 + i * 80) for i in range(5)], 'vertical': True, 'facing_right': True},  # Left (Player 3)
-        {'score_pos': (screen_width - 50, screen_height // 2), 'item_pos': [(screen_width - 170, screen_height // 2 - 150 + i * 80) for i in range(5)], 'vertical': True, 'facing_left': True},  # Right (Player 4)
+        {'score_pos': (screen_width // 2, screen_height - 30), 'item_pos': [(screen_width // 2 - 200 + i * 80, screen_height // 2 + 180) for i in range(5)]},  # Bottom (Player 1)
+        {'score_pos': (screen_width // 2, 30), 'item_pos': [(screen_width // 2 - 200 + i * 100, 100) for i in range(5)]},  # Top (Player 2)
+        {'score_pos': (30, screen_height // 2), 'item_pos': [(100, screen_height // 2 - 200 + i * 80) for i in range(5)], 'vertical': True, 'facing_right': True},  # Left (Player 3)
+        {'score_pos': (screen_width - 30, screen_height // 2), 'item_pos': [(screen_width - 150, screen_height // 2 - 200 + i * 100) for i in range(5)], 'vertical': True, 'facing_left': True},  # Right (Player 4)
     ]
 
     # Scaling down items if necessary
@@ -180,34 +178,30 @@ def draw_game_screen(current_card, items, players):
     # Draw player items and scores
     for i, player in enumerate(players):
         pos = player_positions[i]
-        
+
         # Draw score
         score_text = font.render(f"{player['name']}: {player['score']} pts", True, BLACK)
-        
-        # Rotate the score text for vertical players
+
         if 'vertical' in pos:
             score_text = pygame.transform.rotate(score_text, 90)
-            if 'facing_right' in pos:
-                score_text = pygame.transform.rotate(score_text, 180)
-            elif 'facing_left' in pos:
-                score_text = pygame.transform.rotate(score_text, 0)
-            screen.blit(score_text, score_text.get_rect(center=(pos['score_pos'][0], pos['score_pos'][1] - 150)))
+            screen.blit(score_text, score_text.get_rect(center=pos['score_pos']))
         else:
             screen.blit(score_text, score_text.get_rect(center=pos['score_pos']))
 
         # Draw items
         for j, item_image in enumerate(scaled_items):
             item_rect = item_image.get_rect(topleft=pos['item_pos'][j])
-            
-            # Rotate and flip items for players 3 and 4
+
+            # Rotate items for Player 3 and 4
             if 'facing_right' in pos:
                 item_image = pygame.transform.rotate(item_image, -90)
             elif 'facing_left' in pos:
                 item_image = pygame.transform.rotate(item_image, 90)
-            
+
             screen.blit(item_image, item_rect)
 
     pygame.display.flip()
+
 
 
 
