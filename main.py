@@ -142,6 +142,7 @@ def instructions_popup():
             if close_button.handle_event(event):
                 return  # Exit the popup
 
+
 def instructions_screen():
 
     pygame.init()
