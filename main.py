@@ -154,6 +154,9 @@ def instructions_screen():
 
 
 def draw_game_screen(current_card, items, players):
+
+    pygame.init()
+
     screen.fill(WHITE)
 
     # Draw the current card in the center
