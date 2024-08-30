@@ -25,37 +25,42 @@ button_font = pygame.font.Font(None, 36)
 
 # Button Class
 class Button:
-
-    pygame.init()
-
-    def __init__(self, text, pos, size):
+    def __init__(self, text, pos, size, base_color, hover_color):
         self.text = text
         self.pos = pos
         self.size = size
-        self.color = GRAY
+        self.base_color = base_color
+        self.hover_color = hover_color
+        self.current_color = base_color
         self.rect = pygame.Rect(self.pos, self.size)
         self.text_surf = button_font.render(self.text, True, BLACK)
         self.text_rect = self.text_surf.get_rect(center=self.rect.center)
 
     def draw(self, screen):
-        pygame.draw.rect(screen, self.color, self.rect)
+        pygame.draw.rect(screen, self.current_color, self.rect)
+        pygame.draw.rect(screen, RED, self.rect, 2)  # Add a red border
         screen.blit(self.text_surf, self.text_rect)
 
     def is_hovered(self, mouse_pos):
         return self.rect.collidepoint(mouse_pos)
 
     def handle_event(self, event):
+        if event.type == pygame.MOUSEMOTION:
+            if self.is_hovered(event.pos):
+                self.current_color = self.hover_color
+            else:
+                self.current_color = self.base_color
+
         if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
             if self.is_hovered(pygame.mouse.get_pos()):
                 return True
         return False
 
+
 def start_screen():
 
-    pygame.init()
-
-    start_button = Button('Start', (560, 250), (110, 50))
-    instructions_button = Button('How To Play', (520, 350), (200, 50))
+    start_button = Button('Start', (560, 250), (160, 60), GRAY, DARK_GRAY)
+    instructions_button = Button('How To Play', (520, 350), (240, 60), GRAY, DARK_GRAY)
 
     running = True
     while running:
@@ -69,18 +74,16 @@ def start_screen():
             if instructions_button.handle_event(event):
                 instructions_screen()
 
-        screen.fill(WHITE)
+        screen.fill((0, 64, 128))  # Background color matching the image
         start_button.draw(screen)
         instructions_button.draw(screen)
         pygame.display.flip()
 
+
 def player_selection_screen():
-
-    pygame.init()
-
-    two_players_button = Button('2 Players', (520, 200), (200, 50))
-    three_players_button = Button('3 Players', (520, 300), (200, 50))
-    four_players_button = Button('4 Players', (520, 400), (200, 50))
+    two_players_button = Button('2 Players', (540, 200), (200, 60), GRAY, DARK_GRAY)
+    three_players_button = Button('3 Players', (540, 300), (200, 60), GRAY, DARK_GRAY)
+    four_players_button = Button('4 Players', (540, 400), (200, 60), GRAY, DARK_GRAY)
 
     selecting = True
     while selecting:
@@ -96,11 +99,12 @@ def player_selection_screen():
             if four_players_button.handle_event(event):
                 game_loop(4)
 
-        screen.fill(WHITE)
+        screen.fill((0, 64, 128))  # Background color matching the image
         two_players_button.draw(screen)
         three_players_button.draw(screen)
         four_players_button.draw(screen)
         pygame.display.flip()
+
 
 def instructions_popup():
     # Instructions text
