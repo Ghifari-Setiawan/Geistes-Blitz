@@ -59,8 +59,12 @@ class Button:
 
 def start_screen():
 
-    start_button = Button('Start', (560, 250), (160, 60), GRAY, DARK_GRAY)
-    instructions_button = Button('How To Play', (520, 350), (240, 60), GRAY, DARK_GRAY)
+    start_button = Button('Start', (560, 350), (160, 60), GRAY, DARK_GRAY)
+    instructions_button = Button('How To Play', (520, 450), (240, 60), GRAY, DARK_GRAY)
+
+    # Load the title image
+    title_image = pygame.image.load('assets/titleimg.png')
+    title_image = pygame.transform.scale(title_image, (600, 200))  # Resize if necessary
 
     running = True
     while running:
@@ -75,15 +79,26 @@ def start_screen():
                 instructions_screen()
 
         screen.fill((0, 64, 128))  # Background color matching the image
+
+        # Draw the title image
+        screen.blit(title_image, (screen_width // 2 - title_image.get_width() // 2, 90))
+
+        # Draw the buttons
         start_button.draw(screen)
         instructions_button.draw(screen)
+
         pygame.display.flip()
 
 
 def player_selection_screen():
-    two_players_button = Button('2 Players', (540, 200), (200, 60), GRAY, DARK_GRAY)
-    three_players_button = Button('3 Players', (540, 300), (200, 60), GRAY, DARK_GRAY)
-    four_players_button = Button('4 Players', (540, 400), (200, 60), GRAY, DARK_GRAY)
+
+    # Load the title image
+    selectplayer_image = pygame.image.load('assets/selectplayer.png')
+    selectplayer_image = pygame.transform.scale(selectplayer_image, (600, 200))  # Resize if necessary
+
+    two_players_button = Button('2 Players', (540, 300), (200, 60), GRAY, DARK_GRAY)
+    three_players_button = Button('3 Players', (540, 400), (200, 60), GRAY, DARK_GRAY)
+    four_players_button = Button('4 Players', (540, 500), (200, 60), GRAY, DARK_GRAY)
 
     selecting = True
     while selecting:
@@ -100,9 +115,14 @@ def player_selection_screen():
                 game_loop(4)
 
         screen.fill((0, 64, 128))  # Background color matching the image
+
+        # Draw the title image
+        screen.blit(selectplayer_image, (screen_width // 2 - selectplayer_image.get_width() // 2, 60))
+
         two_players_button.draw(screen)
         three_players_button.draw(screen)
         four_players_button.draw(screen)
+        
         pygame.display.flip()
 
 
