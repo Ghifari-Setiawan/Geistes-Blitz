@@ -59,6 +59,8 @@ class Button:
 
 def start_screen():
 
+    pygame.init()
+
     start_button = Button('Start', (560, 350), (160, 60), GRAY, DARK_GRAY)
     instructions_button = Button('How To Play', (520, 450), (240, 60), GRAY, DARK_GRAY)
 
@@ -91,6 +93,8 @@ def start_screen():
 
 
 def player_selection_screen():
+
+    pygame.init()
 
     # Load the title image
     selectplayer_image = pygame.image.load('assets/selectplayer.png')
