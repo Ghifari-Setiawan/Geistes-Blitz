@@ -45,6 +45,9 @@ class Button:
         return self.rect.collidepoint(mouse_pos)
 
     def handle_event(self, event):
+
+        pygame.init()
+
         if event.type == pygame.MOUSEMOTION:
             if self.is_hovered(event.pos):
                 self.current_color = self.hover_color
@@ -182,7 +185,7 @@ def instructions_screen():
     start_screen()  # Return to the start screen after closing the popup
 
 
-def draw_game_screen(current_card, items, players):
+def draw_game_screen(current_card, items, players, remaining_cards):
     pygame.init()
     screen.fill(WHITE)
 
@@ -192,7 +195,7 @@ def draw_game_screen(current_card, items, players):
     # Position settings for players
     player_positions = [
         {'score_pos': (screen_width // 2, screen_height - 30), 'item_pos': [(screen_width // 2 - 200 + i * 80, screen_height // 2 + 180) for i in range(5)]},  # Bottom (Player 1)
-        {'score_pos': (screen_width // 2, 30), 'item_pos': [(screen_width // 2 - 200 + i * 100, 100) for i in range(5)]},  # Top (Player 2)
+        {'score_pos': (screen_width // 2, screen_height // 2 - 170), 'item_pos': [(screen_width // 2 - 200 + i * 100, 100) for i in range(5)], 'vertical': True, 'facing_down': True},  # Top (Player 2)
         {'score_pos': (30, screen_height // 2 + 170), 'item_pos': [(100, screen_height // 2 - 200 + i * 80) for i in range(5)], 'vertical': True, 'facing_right': True},  # Left (Player 3)
         {'score_pos': (screen_width - 30, screen_height // 2 + 170), 'item_pos': [(screen_width - 150, screen_height // 2 - 200 + i * 100) for i in range(5)], 'vertical': True, 'facing_left': True},  # Right (Player 4)
     ]
@@ -216,6 +219,8 @@ def draw_game_screen(current_card, items, players):
                 score_text = pygame.transform.rotate(score_text, 180)
             elif 'facing_left' in pos: 
                 score_text = pygame.transform.rotate(score_text, 0)
+            elif 'facing_down' in pos:
+                score_text = pygame.transform.rotate(score_text, 90)
             screen.blit(score_text, score_text.get_rect(center=(pos['score_pos'][0], pos['score_pos'][1] - 150)))
         else:
             screen.blit(score_text, score_text.get_rect(center=pos['score_pos']))
@@ -229,8 +234,14 @@ def draw_game_screen(current_card, items, players):
                 item_image = pygame.transform.rotate(item_image, -90)
             elif 'facing_left' in pos:
                 item_image = pygame.transform.rotate(item_image, 90)
+            elif 'facing_down' in pos:
+                item_image = pygame.transform.rotate(item_image, 180)
 
             screen.blit(item_image, item_rect)
+
+    # Draw remaining cards counter
+    remaining_text = font.render(f"Cards Left: {remaining_cards}", True, BLACK)
+    screen.blit(remaining_text, remaining_text.get_rect(center=(screen_width // 2 - 350, screen_height // 2)))
 
     pygame.display.flip()
 
@@ -282,6 +293,7 @@ def display_scores(players):
     for player in players:
         print(f"{player['name']}: {player['score']} pts")
 
+# Handle the logic for item selection
 def handle_item_selection(selected_item, current_card, players, current_player_index, cards):
     # Check current card level and validate selection
     if current_card.level == 1:
@@ -313,18 +325,19 @@ def handle_item_selection(selected_item, current_card, players, current_player_i
     return current_card
 
 def game_loop(num_players):
-
     pygame.init()
 
     # Initialize items and cards
     items = create_items()
     cards = create_cards()
+    remaining_cards = len(cards)
 
     # Initialize player data based on the number of players
     players = [{'name': f'Player {i+1}', 'score': 0} for i in range(num_players)]
 
     current_card = random.choice(cards)  # Get the first card
     current_card.used = True  # Mark card as used
+    remaining_cards -= 1
     current_player_index = 0  # Start with the first player
 
     running = True
@@ -339,8 +352,17 @@ def game_loop(num_players):
                     if item.rect.collidepoint(event.pos):
                         current_card = handle_item_selection(item, current_card, players, current_player_index, cards)
                         current_player_index = (current_player_index + 1) % num_players  # Move to the next player
+                        remaining_cards -= 1
+                        draw_game_screen(current_card, items, players, remaining_cards)
 
-        draw_game_screen(current_card, items, players)  # Send players list to the draw function
+                # Click on the card to reveal the next one
+                if current_card.rect.collidepoint(event.pos):
+                    current_card = handle_item_selection(None, current_card, players, current_player_index, cards)
+                    current_player_index = (current_player_index + 1) % num_players  # Move to the next player
+                    remaining_cards -= 1
+                    draw_game_screen(current_card, items, players, remaining_cards)
+
+        draw_game_screen(current_card, items, players, remaining_cards)  # Send players list to the draw function
 
     pygame.quit()
 
