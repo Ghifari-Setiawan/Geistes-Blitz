@@ -134,6 +134,9 @@ def player_selection_screen():
 
 
 def instructions_popup():
+
+    screen.fill((0, 64, 128))
+
     # Instructions text
     instructions = [
         "How to Play:",
@@ -159,7 +162,7 @@ def instructions_popup():
         screen.blit(instructions_text, (popup_x + 20, popup_y + 20 + i * 30))
 
     # Draw close button
-    close_button = Button('Close', (popup_x + popup_width // 2 - 50, popup_y + popup_height - 60), (100, 40))
+    close_button = Button('Skip', (popup_x + popup_width // 2 - 50, popup_y + popup_height - 60), (100, 40), GRAY, DARK_GRAY)
     close_button.draw(screen)
 
     pygame.display.flip()
