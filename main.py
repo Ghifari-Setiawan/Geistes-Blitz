@@ -244,7 +244,7 @@ def draw_game_screen(current_card, items, players, remaining_cards):
 
     # Draw remaining cards counter
     remaining_text = font.render(f"Cards Left: {remaining_cards}", True, BLACK)
-    screen.blit(remaining_text, remaining_text.get_rect(center=(screen_width // 2 - 350, screen_height // 2)))
+    screen.blit(remaining_text, remaining_text.get_rect(center=(screen_width // 2 - 280, screen_height // 2)))
 
     pygame.display.flip()
 
