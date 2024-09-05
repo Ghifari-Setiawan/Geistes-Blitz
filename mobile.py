@@ -5,6 +5,11 @@ from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.popup import Popup
 from kivy.uix.screenmanager import ScreenManager, Screen
 from kivy.uix.label import Label
+from kivy.uix.image import AsyncImage  # Use AsyncImage to handle card images if they're online
+from kivy.uix.gridlayout import GridLayout
+from kivy.uix.textinput import TextInput
+from kivy.core.window import Window
+
 
 # Set screen dimensions
 from kivy.core.window import Window
@@ -82,22 +87,108 @@ class PlayerSelection(BaseScreen):
         self.manager.get_screen('game_screen').num_players = num_players
         self.manager.current = 'game_screen'
 
+
 class GameScreen(BaseScreen):
     def __init__(self, **kwargs):
         super(GameScreen, self).__init__(**kwargs)
-        self.num_players = 2  # Default value
+        self.num_players = 4
+        self.current_card_index = 0
+        self.player_turn = 0
+        self.scores = [0] * self.num_players
+        self.cards = ['assets/level1/card1.jpg', 'assets/level1/card2.jpg', 'assets/level1/card3.jpg']
+        self.create_game_layout()
 
-    def on_enter(self):
-        # Logic to start the game with the selected number of players
-        print(f"Starting game with {self.num_players} players")
-        # Here, you would add the code for the actual game logic, similar to what you had in the Pygame version
+    def create_game_layout(self):
+        layout = FloatLayout()
 
+        # Add player labels and scores (adjusted position)
+        self.player_labels = [
+            Label(text=f"Player {i+1}", size_hint=(None, None), font_size=24, pos_hint=self.get_player_position(i)) 
+            for i in range(4)
+        ]
+        self.score_labels = [
+            Label(text=f"Score: {self.scores[i]}", size_hint=(None, None), font_size=18, pos_hint=self.get_player_score_position(i))
+            for i in range(4)
+        ]
+
+        for i in range(4):
+            layout.add_widget(self.player_labels[i])
+            layout.add_widget(self.score_labels[i])
+
+        # Center card
+        self.card_image = Image(source=self.cards[self.current_card_index], size_hint=(0.25, 0.25), pos_hint={'center_x': 0.5, 'center_y': 0.5})
+        layout.add_widget(self.card_image)
+
+        # Add selection buttons
+        self.add_selection_buttons(layout)
+
+        self.add_widget(layout)
+
+    def get_player_position(self, player_index):
+        """Returns pos_hint for player labels around the screen based on player index."""
+        positions = [
+            {'center_x': 0.5, 'top': 1},   # Top (Player 1)
+            {'x': 0, 'center_y': 0.5},     # Left (Player 2)
+            {'center_x': 0.5, 'y': 0},     # Bottom (Player 3)
+            {'right': 1, 'center_y': 0.5}  # Right (Player 4)
+        ]
+        return positions[player_index]
+
+    def get_player_score_position(self, player_index):
+        """Returns pos_hint for player score next to their label."""
+        score_positions = [
+            {'center_x': 0.5, 'top': 0.95},   # Top (Player 1)
+            {'x': 0.02, 'center_y': 0.45},     # Left (Player 2)
+            {'center_x': 0.5, 'y': 0.05},     # Bottom (Player 3)
+            {'right': 0.98, 'center_y': 0.45}  # Right (Player 4)
+        ]
+        return score_positions[player_index]
+
+    def add_selection_buttons(self, layout):
+        items = ['Mouse', 'Sofa', 'Bottle', 'Book', 'Ghost']
+
+        # Horizontal layout for Player 1 (top) and Player 3 (bottom)
+        for i, item in enumerate(items):
+            btn_top = Button(text=item, size_hint=(None, None), size=(100, 100), pos_hint={'center_x': 0.3 + i * 0.1, 'top': 0.85})
+            btn_bottom = Button(text=item, size_hint=(None, None), size=(100, 100), pos_hint={'center_x': 0.3 + i * 0.1, 'y': 0.15})
+            layout.add_widget(btn_top)
+            layout.add_widget(btn_bottom)
+
+        # Vertical layout for Player 2 (left) and Player 4 (right)
+        for i, item in enumerate(items):
+            btn_left = Button(text=item, size_hint=(None, None), size=(100, 100), pos_hint={'x': 0.1, 'center_y': 0.75 - i * 0.15})
+            btn_right = Button(text=item, size_hint=(None, None), size=(100, 100), pos_hint={'right': 0.9, 'center_y': 0.75 - i * 0.15})
+            layout.add_widget(btn_left)
+            layout.add_widget(btn_right)
+
+    def next_turn(self):
+        self.player_turn = (self.player_turn + 1) % self.num_players
+        self.update_game()
+
+    def update_game(self):
+        self.current_card_index = (self.current_card_index + 1) % len(self.cards)
+        self.card_image.source = self.cards[self.current_card_index]
+        self.player_labels[self.player_turn].text = f"Player {self.player_turn + 1}'s Turn"
+
+
+def handle_item_selection(selected_item, current_card, players, current_player_index, cards):
+    if current_card.level == 1 and selected_item == current_card.correct_item:
+        players[current_player_index]['score'] += 1  # Correct selection
+    elif current_card.level == 2 and selected_item != current_card.incorrect_item:
+        players[current_player_index]['score'] += 1  # Correct selection
+
+    # Update the game to move to the next player
+    next_player_index = (current_player_index + 1) % len(players)
+    return next_player_index
+
+
+# Update ScreenManager in the main app
 class GeistesBlitzApp(App):
     def build(self):
         sm = ScreenManager()
         sm.add_widget(MainMenu(name='main_menu'))
         sm.add_widget(PlayerSelection(name='player_selection'))
-        sm.add_widget(GameScreen(name='game_screen'))
+        sm.add_widget(GameScreen(name='game_screen'))  # Updated screen with game logic
         return sm
 
 if __name__ == '__main__':
