@@ -9,6 +9,9 @@ from kivy.uix.label import Label
 from kivy.uix.gridlayout import GridLayout
 from kivy.core.window import Window
 from kivy.uix.behaviors import ButtonBehavior
+from kivy.graphics import PushMatrix, PopMatrix, Rotate
+from kivy.uix.videoplayer import VideoPlayer
+from kivy.uix.video import Video
 
 # Set window size at the start
 Window.size = (1280, 720)
@@ -60,15 +63,21 @@ class MainMenu(BaseScreen):
         self.manager.current = 'player_selection'
 
     def show_instructions(self, instance):
-        instructions_text = (
-            "How to Play:\n"
-            "1. Select the number of players.\n"
-            "2. A card will be shown in the center.\n"
-            "3. Players take turns selecting the correct item.\n"
-            "4. Correct choices earn points, wrong choices do not.\n"
-            "5. The game ends when all cards are used."
-        )
-        popup = Popup(title='Instructions', content=Label(text=instructions_text), size_hint=(0.8, 0.6))
+        # Create a layout for the popup
+        popup_layout = FloatLayout()
+
+        # Create the video widget and add it to the layout
+        video = VideoPlayer(source='assets/placeholder.mp4', state='play', size_hint=(0.9, 0.7), pos_hint={'center_x': 0.5, 'center_y': 0.6})
+        popup_layout.add_widget(video)
+
+        # Create a close button to dismiss the popup
+        close_button = Button(text="Close", size_hint=(0.2, 0.1), pos_hint={'center_x': 0.5, 'center_y': 0.1})
+        popup_layout.add_widget(close_button)
+
+        # Create a popup to show the video
+        popup = Popup(title='How to Play', content=popup_layout, size_hint=(0.8, 0.8))
+        close_button.bind(on_press=popup.dismiss)
+
         popup.open()
 
 # Player selection screen
@@ -191,32 +200,66 @@ class GameScreen(BaseScreen):
 
         self.update_player_positions()
 
+    def rotate_label(self, widget, angle):
+        """Rotates the given widget (label) by the specified angle."""
+        widget.canvas.before.clear()  # Clear previous transformations
+        with widget.canvas.before:
+            PushMatrix()  # Save current transformation state
+            Rotate(angle=angle, origin=widget.center)  # Rotate around the widget's center
+            PopMatrix()  # Restore transformation state after the rotate
+
     def update_player_positions(self):
         """Repositions players dynamically based on the number of players."""
         if self.num_players == 2:
             # Player 1 at the bottom, Player 2 at the top
-            self.player_labels[0].pos_hint = {'center_x': 0.5, 'y': 0.05}
-            self.score_labels[0].pos_hint = {'center_x': 0.5, 'y': 0.1}
-            self.player_labels[1].pos_hint = {'center_x': 0.5, 'top': 0.95}
-            self.score_labels[1].pos_hint = {'center_x': 0.5, 'top': 0.9}
+            self.player_labels[0].pos_hint = {'center_x': 0.5, 'y': 0.05}  # Slightly higher from the bottom
+            self.score_labels[0].pos_hint = {'center_x': 0.5, 'y': 0}   # Adjust score position relative to label
+            self.player_labels[1].pos_hint = {'center_x': 0.5, 'top': 0.95}  # Slightly lower from the top
+            self.score_labels[1].pos_hint = {'center_x': 0.5, 'top': 1}  # Adjust score position relative to label
+
+            # Rotate labels to face each other
+            self.rotate_label(self.player_labels[0], angle=0)   # Bottom player
+            self.rotate_label(self.player_labels[1], angle=180)  # Top player
+            self.rotate_label(self.score_labels[0], angle=0)
+            self.rotate_label(self.score_labels[1], angle=180)
+
         elif self.num_players == 3:
-            # Player 1 at the bottom, Player 2 on left, Player 3 on right
-            self.player_labels[0].pos_hint = {'center_x': 0.5, 'y': 0.05}
-            self.score_labels[0].pos_hint = {'center_x': 0.5, 'y': 0.1}
-            self.player_labels[1].pos_hint = {'x': 0.05, 'center_y': 0.5}
-            self.score_labels[1].pos_hint = {'x': 0.05, 'center_y': 0.45}
-            self.player_labels[2].pos_hint = {'right': 0.95, 'center_y': 0.5}
-            self.score_labels[2].pos_hint = {'right': 0.95, 'center_y': 0.45}
+            # Player 1 at the bottom, Player 2 on the left, Player 3 on the right
+            self.player_labels[0].pos_hint = {'center_x': 0.5, 'y': 0.05}  # Adjust bottom position
+            self.score_labels[0].pos_hint = {'center_x': 0.5, 'y': 0}
+            self.player_labels[1].pos_hint = {'x': 0, 'center_y': 0.5}  # Add margin to the left
+            self.score_labels[1].pos_hint = {'x': 0, 'center_y': 0.45}
+            self.player_labels[2].pos_hint = {'right': 1, 'center_y': 0.5}  # Add margin to the right
+            self.score_labels[2].pos_hint = {'right': 1, 'center_y': 0.45}
+
+            # Rotate labels to face each other
+            self.rotate_label(self.player_labels[0], angle=0)   # Bottom player
+            self.rotate_label(self.player_labels[1], angle=90)  # Left player
+            self.rotate_label(self.player_labels[2], angle=-90)  # Right player
+            self.rotate_label(self.score_labels[0], angle=0)
+            self.rotate_label(self.score_labels[1], angle=90)
+            self.rotate_label(self.score_labels[2], angle=-90)
+
         else:
             # Default to 4-player positioning
-            self.player_labels[0].pos_hint = {'center_x': 0.5, 'top': 0.95}
-            self.score_labels[0].pos_hint = {'center_x': 0.5, 'top': 0.9}
-            self.player_labels[1].pos_hint = {'x': 0.05, 'center_y': 0.5}
-            self.score_labels[1].pos_hint = {'x': 0.05, 'center_y': 0.45}
-            self.player_labels[2].pos_hint = {'center_x': 0.5, 'y': 0.05}
-            self.score_labels[2].pos_hint = {'center_x': 0.5, 'y': 0.1}
-            self.player_labels[3].pos_hint = {'right': 0.95, 'center_y': 0.5}
-            self.score_labels[3].pos_hint = {'right': 0.95, 'center_y': 0.45}
+            self.player_labels[0].pos_hint = {'center_x': 0.5, 'top': 0.95}  # Slightly lower from the top
+            self.score_labels[0].pos_hint = {'center_x': 0.5, 'top': 1}
+            self.player_labels[1].pos_hint = {'x': 0, 'center_y': 0.5}  # Add margin to the left
+            self.score_labels[1].pos_hint = {'x': 0, 'center_y': 0.45}
+            self.player_labels[2].pos_hint = {'center_x': 0.5, 'y': 0.05}  # Adjust bottom position
+            self.score_labels[2].pos_hint = {'center_x': 0.5, 'y': 0}
+            self.player_labels[3].pos_hint = {'right': 1, 'center_y': 0.5}  # Add margin to the right
+            self.score_labels[3].pos_hint = {'right': 1, 'center_y': 0.45}
+
+            # Rotate labels to face each other
+            self.rotate_label(self.player_labels[0], angle=180)  # Top player
+            self.rotate_label(self.player_labels[1], angle=90)   # Left player
+            self.rotate_label(self.player_labels[2], angle=0)    # Bottom player
+            self.rotate_label(self.player_labels[3], angle=-90)  # Right player
+            self.rotate_label(self.score_labels[0], angle=180)
+            self.rotate_label(self.score_labels[1], angle=90)
+            self.rotate_label(self.score_labels[2], angle=0)
+            self.rotate_label(self.score_labels[3], angle=-90)
 
     def show_exit_popup(self, instance):
         content = GridLayout(cols=2, spacing=10, padding=10)
@@ -259,13 +302,39 @@ class GameScreen(BaseScreen):
             layout.add_widget(btn_left)
             layout.add_widget(btn_right)
 
+        # Hide buttons for non-existent players initially
+        self.update_selection_buttons_visibility()
+
+    def update_selection_buttons_visibility(self):
+        """Shows or hides player item buttons based on the number of players."""
+        if self.num_players == 2:
+            # Show buttons for Player 1 and Player 2, hide others
+            self.show_player_items(0)
+            self.show_player_items(1)
+            self.hide_player_items(2)
+            self.hide_player_items(3)
+        elif self.num_players == 3:
+            # Show buttons for Player 1, Player 2, and Player 3, hide Player 4
+            self.show_player_items(0)
+            self.show_player_items(1)
+            self.show_player_items(2)
+            self.hide_player_items(3)
+        else:
+            # Show buttons for all 4 players
+            self.show_player_items(0)
+            self.show_player_items(1)
+            self.show_player_items(2)
+            self.show_player_items(3)
+
     def hide_player_items(self, player_index):
         for btn in self.selection_buttons[player_index]:
             btn.opacity = 0
+            btn.disabled = True  # Disable the button
 
     def show_player_items(self, player_index):
         for btn in self.selection_buttons[player_index]:
             btn.opacity = 1
+            btn.disabled = False  # Enable the button
 
 # Build the app and screen manager
 class MyGameApp(App):
