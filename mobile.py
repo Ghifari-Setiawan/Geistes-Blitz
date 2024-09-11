@@ -130,25 +130,35 @@ class GameScreen(BaseScreen):
     def create_game_layout(self):
         self.layout = FloatLayout()
 
-        # Add player labels and scores (adjusted position)
+        # Add player labels and scores (adjusted position and rotation)
         self.player_labels = []
         self.score_labels = []
-        self.selection_buttons = []
 
-        # Add the player labels and score labels
-        for i in range(4):
-            player_label = Label(text=f"Player {i+1}", size_hint=(None, None), font_size=24, pos_hint=self.get_player_position(i))
-            score_label = Label(text=f"Score: {self.scores[i]}", size_hint=(None, None), font_size=18, pos_hint=self.get_player_score_position(i))
+        rotations = [0, 90, 180, 270]
 
-            self.player_labels.append(player_label)
-            self.score_labels.append(score_label)
-            self.layout.add_widget(player_label)
-            self.layout.add_widget(score_label)
+        for i in range(self.num_players):
+            with self.layout.canvas:
+                PushMatrix()
+                Rotate(angle=rotations[i], origin=(self.width / 2, self.height / 2))  # Rotate around the center
 
-        # Center card with animation
-        self.card_image = Image(source=self.cards[self.current_card_index], size_hint=(
-            0.25, 0.25), pos_hint={'center_x': 0.5, 'center_y': 0.55})
+                player_label = Label(text=f"Player {i+1}", font_size=24, pos_hint=self.get_player_position(i))
+                score_label = Label(text=f"{self.scores[i]} pts", font_size=18, pos_hint=self.get_player_score_position(i))
+
+                self.player_labels.append(player_label)
+                self.score_labels.append(score_label)
+                self.layout.add_widget(player_label)
+                self.layout.add_widget(score_label)
+
+                PopMatrix()
+
+        # Add the card image
+        self.card_image = Image(source=self.cards[self.current_card_index], size_hint=(0.25, 0.25), pos_hint={'center_x': 0.5, 'center_y': 0.55})
         self.layout.add_widget(self.card_image)
+
+        # Add card indicator label
+        self.cards_left_label = Label(text=f"Cards Left: {len(self.cards) - self.current_card_index}",
+                                    font_size=24, pos_hint={'center_x': 0.5, 'center_y': 0.7})
+        self.layout.add_widget(self.cards_left_label)
 
         # Add selection buttons (ensure 5 items for all players)
         self.add_selection_buttons(self.layout)
@@ -160,6 +170,10 @@ class GameScreen(BaseScreen):
         self.layout.add_widget(exit_button)
 
         self.add_widget(self.layout)
+
+    def update_card_indicator(self):
+        cards_left = len(self.cards) - self.current_card_index
+        self.cards_left_label.text = f"Cards Left: {cards_left}"
 
     def animate_card_flip(self):
         """Animates the card flip with scaling and plays sound."""
@@ -197,33 +211,41 @@ class GameScreen(BaseScreen):
         self.update_player_positions()
 
     def update_player_positions(self):
-        """Repositions players dynamically based on the number of players."""
+        """Repositions players dynamically based on the number of players and rotation."""
+        layout_width, layout_height = self.layout.size  # Get the layout's size
+
         if self.num_players == 2:
             # Player 1 at the bottom, Player 2 at the top
-            self.player_labels[0].pos_hint = {'center_x': 0.5, 'y': 0.05}
-            self.score_labels[0].pos_hint = {'center_x': 0.5, 'y': 0}
-            self.player_labels[1].pos_hint = {'center_x': 0.5, 'top': 0.95}
-            self.score_labels[1].pos_hint = {'center_x': 0.5, 'top': 1}
+            self.player_labels[0].pos = (layout_width / 2 - self.player_labels[0].width / 2, 0.1 * layout_height)
+            self.score_labels[0].pos = (layout_width / 2 - self.score_labels[0].width / 2, 0.05 * layout_height)
+
+            self.player_labels[1].pos = (layout_width / 2 - self.player_labels[1].width / 2, 0.85 * layout_height - self.player_labels[1].height)
+            self.score_labels[1].pos = (layout_width / 2 - self.score_labels[1].width / 2, 0.80 * layout_height)
 
         elif self.num_players == 3:
             # Player 1 at the bottom, Player 2 on the left, Player 3 on the right
-            self.player_labels[0].pos_hint = {'center_x': 0.5, 'y': 0.05}
-            self.score_labels[0].pos_hint = {'center_x': 0.5, 'y': 0}
-            self.player_labels[1].pos_hint = {'x': 0, 'center_y': 0.5}
-            self.score_labels[1].pos_hint = {'x': 0, 'center_y': 0.45}
-            self.player_labels[2].pos_hint = {'right': 1, 'center_y': 0.5}
-            self.score_labels[2].pos_hint = {'right': 1, 'center_y': 0.45}
+            self.player_labels[0].pos = (layout_width / 2 - self.player_labels[0].width / 2, 0.1 * layout_height)
+            self.score_labels[0].pos = (layout_width / 2 - self.score_labels[0].width / 2, 0.05 * layout_height)
+
+            self.player_labels[1].pos = (0.1 * layout_width, layout_height / 2 - self.player_labels[1].height / 2)
+            self.score_labels[1].pos = (0.1 * layout_width, layout_height / 2 - self.score_labels[1].height / 2 - 30)
+
+            self.player_labels[2].pos = (0.9 * layout_width - self.player_labels[2].width, layout_height / 2 - self.player_labels[2].height / 2)
+            self.score_labels[2].pos = (0.9 * layout_width - self.score_labels[2].width, layout_height / 2 - self.score_labels[2].height / 2 - 30)
 
         else:
             # Default to 4-player positioning
-            self.player_labels[0].pos_hint = {'center_x': 0.5, 'top': 0.95}
-            self.score_labels[0].pos_hint = {'center_x': 0.5, 'top': 1}
-            self.player_labels[1].pos_hint = {'x': 0, 'center_y': 0.5}
-            self.score_labels[1].pos_hint = {'x': 0, 'center_y': 0.45}
-            self.player_labels[2].pos_hint = {'center_x': 0.5, 'y': 0.05}
-            self.score_labels[2].pos_hint = {'center_x': 0.5, 'y': 0}
-            self.player_labels[3].pos_hint = {'right': 1, 'center_y': 0.5}
-            self.score_labels[3].pos_hint = {'right': 1, 'center_y': 0.45}
+            self.player_labels[0].pos = (layout_width / 2 - self.player_labels[0].width / 2, 0.1 * layout_height)
+            self.score_labels[0].pos = (layout_width / 2 - self.score_labels[0].width / 2, 0.05 * layout_height)
+
+            self.player_labels[1].pos = (0.1 * layout_width, layout_height / 2 - self.player_labels[1].height / 2)
+            self.score_labels[1].pos = (0.1 * layout_width, layout_height / 2 - self.score_labels[1].height / 2 - 30)
+
+            self.player_labels[2].pos = (layout_width / 2 - self.player_labels[2].width / 2, 0.85 * layout_height - self.player_labels[2].height)
+            self.score_labels[2].pos = (layout_width / 2 - self.score_labels[2].width / 2, 0.80 * layout_height)
+
+            self.player_labels[3].pos = (0.9 * layout_width - self.player_labels[3].width, layout_height / 2 - self.player_labels[3].height / 2)
+            self.score_labels[3].pos = (0.9 * layout_width - self.score_labels[3].width, layout_height / 2 - self.score_labels[3].height / 2 - 30)
 
     def show_exit_popup(self, instance):
         content = GridLayout(cols=2, spacing=10, padding=10)
