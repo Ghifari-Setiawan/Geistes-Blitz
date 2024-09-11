@@ -9,7 +9,7 @@ from kivy.uix.label import Label
 from kivy.uix.gridlayout import GridLayout
 from kivy.core.window import Window
 from kivy.uix.behaviors import ButtonBehavior
-from kivy.graphics import PushMatrix, PopMatrix, Rotate
+from kivy.graphics import PushMatrix, PopMatrix, Rotate, Translate
 from kivy.uix.videoplayer import VideoPlayer
 from kivy.uix.video import Video
 
@@ -205,7 +205,7 @@ class GameScreen(BaseScreen):
         widget.canvas.before.clear()  # Clear previous transformations
         with widget.canvas.before:
             PushMatrix()  # Save current transformation state
-            Rotate(angle=angle, origin=widget.center)  # Rotate around the widget's center
+            Rotate(angle=angle, axis=(1,0,0))  # Rotate around the widget's center
             PopMatrix()  # Restore transformation state after the rotate
 
     def update_player_positions(self):
@@ -281,13 +281,13 @@ class GameScreen(BaseScreen):
         popup.open()
 
     def add_selection_buttons(self, layout):
-        self.items = ['Mouse', 'Sofa', 'Bottle', 'Book', 'Ghost']
+        self.items = ['assets/tikus.png', 'assets/sofa.png', 'assets/botol.png', 'assets/buku.png', 'assets/setan.png']
         self.selection_buttons = []
 
         # Horizontal layout for Player 1 (top) and Player 2 (bottom)
         for i, item in enumerate(self.items):
-            btn_top = Button(text=item, size_hint=(None, None), size=(100, 100), pos_hint={'center_x': 0.3 + i * 0.1, 'top': 0.85})
-            btn_bottom = Button(text=item, size_hint=(None, None), size=(100, 100), pos_hint={'center_x': 0.3 + i * 0.1, 'y': 0.15})
+            btn_top = ImageButton(source=item, size_hint=(None, None), size=(100, 100), pos_hint={'center_x': 0.3 + i * 0.1, 'top': 0.85})
+            btn_bottom = ImageButton(source=item, size_hint=(None, None), size=(100, 100), pos_hint={'center_x': 0.3 + i * 0.1, 'y': 0.15})
 
             self.selection_buttons.append((btn_top, btn_bottom))
             layout.add_widget(btn_top)
@@ -295,8 +295,8 @@ class GameScreen(BaseScreen):
 
         # Vertical layout for Player 3 (left) and Player 4 (right)
         for i, item in enumerate(self.items):
-            btn_left = Button(text=item, size_hint=(None, None), size=(100, 100), pos_hint={'x': 0.1, 'center_y': 0.75 - i * 0.15})
-            btn_right = Button(text=item, size_hint=(None, None), size=(100, 100), pos_hint={'right': 0.9, 'center_y': 0.75 - i * 0.15})
+            btn_left = ImageButton(source=item, size_hint=(None, None), size=(100, 100), pos_hint={'x': 0.1, 'center_y': 0.75 - i * 0.15})
+            btn_right = ImageButton(source=item, size_hint=(None, None), size=(100, 100), pos_hint={'right': 0.9, 'center_y': 0.75 - i * 0.15})
 
             self.selection_buttons.append((btn_left, btn_right))
             layout.add_widget(btn_left)
@@ -337,7 +337,7 @@ class GameScreen(BaseScreen):
             btn.disabled = False  # Enable the button
 
 # Build the app and screen manager
-class MyGameApp(App):
+class GeistesBlitz(App):
     def build(self):
         sm = ScreenManager()
         sm.add_widget(MainMenu(name='main_menu'))
@@ -348,4 +348,4 @@ class MyGameApp(App):
 
 # Run the app
 if __name__ == "__main__":
-    MyGameApp().run()
+    GeistesBlitz().run()
