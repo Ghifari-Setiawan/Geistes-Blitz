@@ -49,9 +49,21 @@ class MainMenu(BaseScreen):
         title_image = Image(source='assets/titleimg.png', size_hint=(0.6, 0.6), pos_hint={'center_x': 0.5, 'top': 1})
         layout.add_widget(title_image)
 
-        # Add buttons
-        start_button = Button(text="Start", size_hint=(0.2, 0.1), pos_hint={'center_x': 0.5, 'center_y': 0.4})
-        instructions_button = Button(text="How To Play", size_hint=(0.2, 0.1), pos_hint={'center_x': 0.5, 'center_y': 0.25})
+        # Add Start button
+        start_button = Button(
+            size_hint=(0.2, 0.12),
+            pos_hint={'center_x': 0.5, 'center_y': 0.4},
+            background_normal='assets/start.png',  # Use your styled button image
+            background_down='assets/start_button_pressed.png',
+        )
+
+        # Add How to Play button
+        instructions_button = Button(
+            size_hint=(0.3, 0.12),
+            pos_hint={'center_x': 0.5, 'center_y': 0.2},
+            background_normal='assets/howtoplay.png',  # Styled button image
+            background_down='assets/howtoplay_button_pressed.png',
+        )
 
         start_button.bind(on_press=self.start_game)
         instructions_button.bind(on_press=self.show_instructions)
@@ -90,24 +102,49 @@ class PlayerSelection(BaseScreen):
         layout = FloatLayout()
 
         # Add the 'Select Player' image at the top
-        select_player_image = Image(source='assets/selectplayer.png', size_hint=(0.6, 0.6), pos_hint={'center_x': 0.5, 'top': 1.05})
+        select_player_image = Image(source='assets/selectplayer.png', size_hint=(0.6, 0.6), pos_hint={'center_x': 0.5, 'top': 1.1})
         layout.add_widget(select_player_image)
 
-        # Add buttons for player selection (2 to 4 players)
-        two_players_button = Button(text="2 Players", size_hint=(0.2, 0.1), pos_hint={'center_x': 0.5, 'center_y': 0.45})
-        three_players_button = Button(text="3 Players", size_hint=(0.2, 0.1), pos_hint={'center_x': 0.5, 'center_y': 0.35})
-        four_players_button = Button(text="4 Players", size_hint=(0.2, 0.1), pos_hint={'center_x': 0.5, 'center_y': 0.25})
+        # Add buttons for player selection with background images
+        two_players_button = Button(
+            size_hint=(0.35, 0.12),
+            pos_hint={'center_x': 0.5, 'center_y': 0.55},
+            background_normal='assets/2players.png',
+            background_down='assets/2player_button_pressed.png',
+        )
+        
+        three_players_button = Button(
+            size_hint=(0.35, 0.12),
+            pos_hint={'center_x': 0.5, 'center_y': 0.4},
+            background_normal='assets/3players.png',
+            background_down='assets/3player_button_pressed.png',
+        )
 
+        four_players_button = Button(
+            size_hint=(0.35, 0.12),
+            pos_hint={'center_x': 0.5, 'center_y': 0.25},
+            background_normal='assets/4players.png',
+            background_down='assets/4player_button_pressed.png',
+        )
+
+        # Bind the button events
         two_players_button.bind(on_press=lambda x: self.start_game(2))
         three_players_button.bind(on_press=lambda x: self.start_game(3))
         four_players_button.bind(on_press=lambda x: self.start_game(4))
 
+        # Add the buttons to the layout
         layout.add_widget(two_players_button)
         layout.add_widget(three_players_button)
         layout.add_widget(four_players_button)
 
         # Back button to return to the main menu
-        back_button = Button(text="Back", size_hint=(0.2, 0.1), pos_hint={'center_x': 0.5, 'center_y': 0.15})
+        back_button = Button(
+            text="Back",
+            size_hint=(0.2, 0.1),
+            pos_hint={'center_x': 0.5, 'center_y': 0.1},
+            background_normal='assets/back_button.png',  # Optional back button styling
+            background_down='assets/back_button_pressed.png'
+        )
         back_button.bind(on_press=self.go_back)
         layout.add_widget(back_button)
 
@@ -250,8 +287,8 @@ class GameScreen(BaseScreen):
 
         else:
             # Default to 4-player positioning
-            self.player_labels[0].pos = (layout_width / 2 - self.player_labels[0].width / 2, 0.1 * layout_height)
-            self.score_labels[0].pos = (layout_width / 2 - self.score_labels[0].width / 2, 0.05 * layout_height)
+            self.player_labels[0].pos = (layout_width / 2 - self.player_labels[0].width / 2, 0.01 * layout_height)
+            self.score_labels[0].pos = (layout_width / 2 - self.score_labels[0].width / 2, 0.005 * layout_height)
 
             self.player_labels[1].pos = (0.1 * layout_width, layout_height / 2 - self.player_labels[1].height / 2)
             self.score_labels[1].pos = (0.1 * layout_width, layout_height / 2 - self.score_labels[1].height / 2 - 30)
