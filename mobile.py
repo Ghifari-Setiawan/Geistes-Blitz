@@ -106,7 +106,22 @@ class PlayerSelection(BaseScreen):
         layout.add_widget(three_players_button)
         layout.add_widget(four_players_button)
 
+        # Back button to return to the main menu
+        back_button = Button(text="Back", size_hint=(0.2, 0.1), pos_hint={'center_x': 0.5, 'center_y': 0.15})
+        back_button.bind(on_press=self.go_back)
+        layout.add_widget(back_button)
+
         self.add_widget(layout)
+
+    def start_game(self, num_players):
+        game_screen = self.manager.get_screen('game_screen')
+        game_screen.num_players = num_players
+        game_screen.update_player_labels_and_scores()
+        self.manager.current = 'game_screen'
+
+    def go_back(self, instance):
+        self.manager.current = 'main_menu'
+
 
     def start_game(self, num_players):
         game_screen = self.manager.get_screen('game_screen')
