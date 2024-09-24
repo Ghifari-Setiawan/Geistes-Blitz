@@ -14,6 +14,9 @@ from kivy.uix.videoplayer import VideoPlayer
 from kivy.uix.video import Video
 from kivy.animation import Animation
 from kivy.core.audio import SoundLoader
+from kivy.graphics import Ellipse, Color
+from kivy.uix.widget import Widget
+
 
 # Set window size at the start
 Window.size = (1280, 720)
@@ -164,6 +167,53 @@ class PlayerSelection(BaseScreen):
         game_screen.num_players = num_players
         game_screen.update_player_labels_and_scores()
         self.manager.current = 'game_screen'
+
+def animate_card_flip(self):
+    """Animates the card with rotation and floating effects, plays sound."""
+    if self.current_card_index >= len(self.cards):
+        return
+
+    self.card_image.source = self.cards[self.current_card_index]
+
+    # Create a more complex animation: rotation + scaling
+    anim = Animation(scale=0, duration=0.2) + Animation(scale=1, duration=0.2) + Animation(rotation=360, duration=0.5)
+    anim.start(self.card_image)
+
+    if self.card_flip_sound:
+        self.card_flip_sound.play()
+
+    # Update card index
+    self.current_card_index += 1
+    self.update_card_indicator()
+
+    # Check if it's the last card, and trigger a win if needed
+    if self.current_card_index >= len(self.cards):
+        self.on_player_win(self.player_turn)
+
+
+def trigger_confetti_animation(self):
+    for _ in range(50):  # Create multiple confetti pieces
+        confetti = Confetti()
+        self.layout.add_widget(confetti)
+        confetti.animate()
+
+class Confetti(Widget):
+    def __init__(self, **kwargs):
+        super(Confetti, self).__init__(**kwargs)
+        self.image = Image(source="assets/confetti.png", size_hint=(None, None), size=(30, 30))
+        self.add_widget(self.image)
+        self.image.pos = (randint(0, Window.width), Window.height)  # Start from top
+
+    def animate(self):
+        # Animate the confetti falling down
+        end_pos = (self.image.x, 0)
+        anim = Animation(pos=end_pos, duration=2, t='out_bounce')
+        anim.bind(on_complete=self.remove_confetti)
+        anim.start(self.image)
+
+    def remove_confetti(self, *args):
+        # Remove confetti once it reaches the bottom
+        self.parent.remove_widget(self)
 
 
 class GameScreen(BaseScreen):
