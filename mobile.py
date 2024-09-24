@@ -139,8 +139,7 @@ class PlayerSelection(BaseScreen):
 
         # Back button to return to the main menu
         back_button = Button(
-            text="Back",
-            size_hint=(0.2, 0.1),
+            size_hint=(0.15, 0.1),
             pos_hint={'center_x': 0.5, 'center_y': 0.1},
             background_normal='assets/back_button.png',  # Optional back button styling
             background_down='assets/back_button_pressed.png'
