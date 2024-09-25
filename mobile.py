@@ -1,4 +1,5 @@
 # Import statements (keep at the top)
+from random import randint
 from kivy.app import App
 from kivy.uix.button import Button
 from kivy.uix.image import Image

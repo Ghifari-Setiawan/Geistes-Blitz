@@ -100,7 +100,7 @@ class GameScreen(Screen):
             else:
                 print(f"{players[current_player_index]['name']} selected the wrong item!")
         elif self.current_card['level'] == 2:
-            if selected_item['name'] != self.current_card['incorrect_item']:
+            if selected_item['name'] == self.current_card['incorrect_item']:
                 players[current_player_index]['score'] += 1
                 print(f"{players[current_player_index]['name']} selected the correct item!")
             else:
