@@ -387,9 +387,9 @@ class GameScreen(BaseScreen):
 
     def show_exit_popup(self, instance):
         """Displays a confirmation popup when the exit button is pressed."""
-        content = GridLayout(cols=2, spacing=10, padding=10)
-        yes_button = Button(text="Yes", size_hint=(0.4, 0.4))
-        no_button = Button(text="No", size_hint=(0.4, 0.4))
+        content = GridLayout(cols=1, spacing=2, padding=2)
+        yes_button = Button(text="Yes", size_hint=(1.1, 1.2))
+        no_button = Button(text="No", size_hint=(1.1, 1.2))
 
         popup = Popup(
             title="Exit Confirmation",
