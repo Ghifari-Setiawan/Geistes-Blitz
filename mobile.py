@@ -278,7 +278,7 @@ class GameScreen(BaseScreen):
 
     def add_card_at_position(self, card, pos_hint):
         """Menambahkan kartu ke layar pada posisi tertentu."""
-        card_image = ImageButton(source=card['image'], size_hint=(0.30, 0.30), pos_hint=pos_hint)
+        card_image = ImageButton(source='assets/back_card.jpg', size_hint=(0.30, 0.30), pos_hint=pos_hint)
         card_image.bind(on_press=self.card_clicked)
         self.layout.add_widget(card_image)
         return card_image
@@ -299,8 +299,6 @@ class GameScreen(BaseScreen):
                 self.is_second_card_visible = True
             else:
                 # Jika kedua kartu sudah muncul, ganti gambar dari kedua kartu tersebut
-                self.card_image_1.source = self.cards[self.current_card_index]['image']
-                self.current_card_index += 1
                 if self.current_card_index < len(self.cards):
                     self.card_image_2.source = self.cards[self.current_card_index]['image']
 
