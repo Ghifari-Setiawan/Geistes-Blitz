@@ -255,7 +255,7 @@ class GameScreen(BaseScreen):
         self.update_player_labels_and_scores()  # Position the player labels and scores
 
         # Add the center card image
-        self.card_image = Image(source=self.cards[self.current_card_index]['image'], size_hint=(0.25, 0.25), pos_hint={'center_x': 0.5, 'center_y': 0.55})
+        self.card_image = Image(source=self.cards[self.current_card_index]['image'], size_hint=(0.30, 0.30), pos_hint={'center_x': 0.5, 'center_y': 0.50})
         self.layout.add_widget(self.card_image)
 
         # Add card indicator label (optional for showing remaining cards)
@@ -268,7 +268,7 @@ class GameScreen(BaseScreen):
         self.add_selection_buttons()
 
         # Add an exit button below the center card
-        exit_button = ImageButton(source='assets/exit_icon_button.png', size_hint=(None, None), size=(64, 64), pos_hint={'center_x': 0.5, 'center_y': 0.400})
+        exit_button = ImageButton(source='assets/exit_icon_button.png', size_hint=(None, None), size=(64, 64), pos_hint={'center_x': 0.5, 'center_y': 0.30})
         exit_button.bind(on_press=self.show_exit_popup)
         self.layout.add_widget(exit_button)
 
@@ -277,9 +277,9 @@ class GameScreen(BaseScreen):
     def add_selection_buttons(self):
         """Creates item selection buttons for each player."""
         positions = [{'center_x': 0.53, 'center_y': 0.80},  # Player 1 (top)
-                     {'center_x': 0.25, 'center_y': 0.70},  # Player 2 (left)
-                     {'center_x': 0.53, 'y': 0.20},  # Player 3 (bottom)
-                     {'center_x': 1.00, 'center_y': 0.70}]  # Player 4 (right)
+                     {'center_x': 0.25, 'center_y': 0.65},  # Player 2 (left)
+                     {'center_x': 0.53, 'y': 0.10},  # Player 3 (bottom)
+                     {'center_x': 1.00, 'center_y': 0.65}]  # Player 4 (right)
 
         # For each player, create item buttons around their position
         for i in range(self.num_players):
@@ -299,16 +299,16 @@ class GameScreen(BaseScreen):
         """Positions player labels and score labels."""
         label_positions = [
             {'center_x': 0.50, 'center_y': 0.95},  # Player 1 (top center)
-            {'center_x': 0.05, 'center_y': 0.6},  # Player 2 (left)
-            {'center_x': 0.50, 'y': -0.27},  # Player 3 (bottom center)
-            {'center_x': 0.95, 'center_y': 0.6},  # Player 4 (right)
+            {'center_x': 0.05, 'center_y': 0.500},  # Player 2 (left)
+            {'center_x': 0.50, 'y': -0.35},  # Player 3 (bottom center)
+            {'center_x': 0.95, 'center_y': 0.500},  # Player 4 (right)
         ]
 
         score_positions = [
             {'center_x': 0.50, 'center_y': 0.90},
-            {'center_x': 0.05, 'center_y': 0.55},
-            {'center_x': 0.50, 'y': -0.33},
-            {'center_x': 0.95, 'center_y': 0.55},
+            {'center_x': 0.05, 'center_y': 0.460},
+            {'center_x': 0.50, 'y': -0.40},
+            {'center_x': 0.95, 'center_y': 0.460},
         ]
 
         for i in range(self.num_players):
