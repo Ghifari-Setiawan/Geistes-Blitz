@@ -226,6 +226,9 @@ class GameScreen(BaseScreen):
         self.scores = [0] * self.num_players
         self.cards = []
         self.items = []
+        self.card_image_1 = None  # Kartu pertama
+        self.card_image_2 = None  # Kartu kedua
+        self.is_second_card_visible = False  # Menandakan apakah kartu kedua sudah muncul
         self.create_game_layout()
         self.card_flip_sound = SoundLoader.load('assets/card_flip.wav')  # Load sound effect
         self.success_sound = SoundLoader.load('assets/success.wav')
@@ -236,7 +239,7 @@ class GameScreen(BaseScreen):
         # Create items and cards
         self.items = self.create_items()
         self.cards = self.create_cards()
-        self.current_card = self.cards[0]  
+        self.current_card = self.cards[0]
 
         # Add player labels and scores
         self.player_labels = []
@@ -254,9 +257,8 @@ class GameScreen(BaseScreen):
 
         self.update_player_labels_and_scores()  # Position the player labels and scores
 
-        # Add the center card image
-        self.card_image = Image(source=self.cards[self.current_card_index]['image'], size_hint=(0.30, 0.30), pos_hint={'center_x': 0.5, 'center_y': 0.50})
-        self.layout.add_widget(self.card_image)
+        # Add first card at the center
+        self.card_image_1 = self.add_card_at_position(self.cards[self.current_card_index], pos_hint={'center_x': 0.4, 'center_y': 0.50})
 
         # Add card indicator label (optional for showing remaining cards)
         self.cards_left_label = Label(text=f"Cards Left: {len(self.cards) - self.current_card_index}",
@@ -273,6 +275,46 @@ class GameScreen(BaseScreen):
         self.layout.add_widget(exit_button)
 
         self.add_widget(self.layout)
+
+    def add_card_at_position(self, card, pos_hint):
+        """Menambahkan kartu ke layar pada posisi tertentu."""
+        card_image = ImageButton(source=card['image'], size_hint=(0.30, 0.30), pos_hint=pos_hint)
+        card_image.bind(on_press=self.card_clicked)
+        self.layout.add_widget(card_image)
+        return card_image
+
+    def card_clicked(self, instance):
+        """Method yang dipanggil saat kartu diklik."""
+        print("Kartu diklik!")
+
+        # Panggil animasi flip kartu (optional)
+        self.animate_card_flip()
+
+        # Update kartu yang ditampilkan
+        self.current_card_index += 1
+        if self.current_card_index < len(self.cards):
+            if not self.is_second_card_visible:
+                # Jika kartu kedua belum muncul, tampilkan kartu kedua
+                self.card_image_2 = self.add_card_at_position(self.cards[self.current_card_index], pos_hint={'center_x': 0.6, 'center_y': 0.50})
+                self.is_second_card_visible = True
+            else:
+                # Jika kedua kartu sudah muncul, ganti gambar dari kedua kartu tersebut
+                self.card_image_1.source = self.cards[self.current_card_index]['image']
+                self.current_card_index += 1
+                if self.current_card_index < len(self.cards):
+                    self.card_image_2.source = self.cards[self.current_card_index]['image']
+
+            # Update label jumlah kartu yang tersisa
+            self.cards_left_label.text = f"Cards Left: {len(self.cards) - self.current_card_index}"
+
+        else:
+            print("Semua kartu sudah digunakan.")
+
+    def animate_card_flip(self):
+        """Animasi flip kartu (dummy, bisa ditambahkan animasi sebenarnya)."""
+        print("Animasi flip kartu berjalan...")
+
+
 
     def add_selection_buttons(self):
         """Creates item selection buttons for each player."""
