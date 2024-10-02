@@ -366,38 +366,38 @@ class GameScreen(BaseScreen):
         if self.num_players == 2:
             print("Permainan sudah dimulai dengan 2 Players!")
             # Player 1 at the bottom, Player 2 at the top
-            self.player_labels[0].pos_hint = {'center_x': 0.5, 'center_y': 0.2}  # Centered near the bottom
-            self.score_labels[0].pos_hint = {'center_x': 0.5, 'center_y': 0.15}
+            self.player_labels[0].pos_hint = {'center_x': 0.5, 'center_y': 0.130}  # Centered near the bottom
+            self.score_labels[0].pos_hint = {'center_x': 0.5, 'center_y': 0.090}
 
-            self.player_labels[1].pos_hint = {'center_x': 0.5, 'center_y': 0.9}  # Centered near the top
-            self.score_labels[1].pos_hint = {'center_x': 0.5, 'center_y': 0.85}
+            self.player_labels[1].pos_hint = {'center_x': 0.5, 'center_y': 0.95}  # Centered near the top
+            self.score_labels[1].pos_hint = {'center_x': 0.5, 'center_y': 0.90}
 
         elif self.num_players == 3:
             print("Permainan sudah dimulai dengan 3 Players!")
             # Player 1 at the bottom, Player 2 on the left, Player 3 on the right
-            self.player_labels[0].pos_hint = {'center_x': 0.5, 'center_y': 0.2}  # Bottom center
-            self.score_labels[0].pos_hint = {'center_x': 0.5, 'center_y': 0.15}
+            self.player_labels[0].pos_hint = {'center_x': 0.5, 'center_y': 0.130}  # Bottom center
+            self.score_labels[0].pos_hint = {'center_x': 0.5, 'center_y': 0.090}
 
-            self.player_labels[1].pos_hint = {'center_x': 0.15, 'center_y': 0.5}  # Left center
-            self.score_labels[1].pos_hint = {'center_x': 0.15, 'center_y': 0.45}
+            self.player_labels[1].pos_hint = {'center_x': 0.050, 'center_y': 0.5}  # Left center
+            self.score_labels[1].pos_hint = {'center_x': 0.050, 'center_y': 0.45}
 
-            self.player_labels[2].pos_hint = {'center_x': 0.85, 'center_y': 0.5}  # Right center
-            self.score_labels[2].pos_hint = {'center_x': 0.85, 'center_y': 0.45}
+            self.player_labels[2].pos_hint = {'center_x': 0.95, 'center_y': 0.5}  # Right center
+            self.score_labels[2].pos_hint = {'center_x': 0.95, 'center_y': 0.45}
 
         else:
             print("Permainan sudah dimulai dengan 4 Players!")
             # Player 1 at the bottom, Player 2 on the left, Player 3 on the top, Player 4 on the right
-            self.player_labels[0].pos_hint = {'center_x': 0.5, 'center_y': 0.2}  # Bottom center
-            self.score_labels[0].pos_hint = {'center_x': 0.5, 'center_y': 0.15}
+            self.player_labels[0].pos_hint = {'center_x': 0.5, 'center_y': 0.130}  # Bottom center
+            self.score_labels[0].pos_hint = {'center_x': 0.5, 'center_y': 0.090}
 
-            self.player_labels[1].pos_hint = {'center_x': 0.15, 'center_y': 0.5}  # Left center
-            self.score_labels[1].pos_hint = {'center_x': 0.15, 'center_y': 0.45}
+            self.player_labels[1].pos_hint = {'center_x': 0.050, 'center_y': 0.5}  # Left center
+            self.score_labels[1].pos_hint = {'center_x': 0.050, 'center_y': 0.45}
 
-            self.player_labels[2].pos_hint = {'center_x': 0.5, 'center_y': 0.8}  # Top center
-            self.score_labels[2].pos_hint = {'center_x': 0.5, 'center_y': 0.75}
+            self.player_labels[2].pos_hint = {'center_x': 0.5, 'center_y': 0.95}  # Top center
+            self.score_labels[2].pos_hint = {'center_x': 0.5, 'center_y': 0.90}
 
-            self.player_labels[3].pos_hint = {'center_x': 0.85, 'center_y': 0.5}  # Right center
-            self.score_labels[3].pos_hint = {'center_x': 0.85, 'center_y': 0.45}
+            self.player_labels[3].pos_hint = {'center_x': 0.95, 'center_y': 0.5}  # Right center
+            self.score_labels[3].pos_hint = {'center_x': 0.95, 'center_y': 0.45}
 
 
 
@@ -417,8 +417,24 @@ class GameScreen(BaseScreen):
         return [
             {'image': 'assets/level1/card1.jpg', 'correct_item': 'Sofa', 'incorrect_item': None, 'level': 1, 'used': False},
             {'image': 'assets/level1/card2.jpg', 'correct_item': 'Ghost', 'incorrect_item': None, 'level': 1, 'used': False},
+            {'image': 'assets/level1/card3.jpg', 'correct_item': 'Sofa', 'incorrect_item': None, 'level': 1, 'used': False},
+            {'image': 'assets/level1/card4.jpg', 'correct_item': 'Ghost', 'incorrect_item': None, 'level': 1, 'used': False},
+            {'image': 'assets/level1/card5.jpg', 'correct_item': 'Book', 'incorrect_item': None, 'level': 1, 'used': False},
+            {'image': 'assets/level1/card6.jpg', 'correct_item': 'Ghost', 'incorrect_item': None, 'level': 1, 'used': False},
+            {'image': 'assets/level1/card7.jpg', 'correct_item': 'Book', 'incorrect_item': None, 'level': 1, 'used': False},
+            {'image': 'assets/level1/card8.jpg', 'correct_item': 'Mouse', 'incorrect_item': None, 'level': 1, 'used': False},
+            {'image': 'assets/level1/card9.jpg', 'correct_item': 'Sofa', 'incorrect_item': None, 'level': 1, 'used': False},
+            {'image': 'assets/level1/card10.jpg', 'correct_item': 'Ghost', 'incorrect_item': None, 'level': 1, 'used': False},
+            {'image': 'assets/level2/card11.jpg', 'correct_item': None, 'incorrect_item': 'Sofa', 'level': 2, 'used': False},
+            {'image': 'assets/level2/card12.jpg', 'correct_item': None, 'incorrect_item': 'Bottle', 'level': 2, 'used': False},
             {'image': 'assets/level2/card13.jpg', 'correct_item': None, 'incorrect_item': 'Mouse', 'level': 2, 'used': False},
             {'image': 'assets/level2/card14.jpg', 'correct_item': None, 'incorrect_item': 'Bottle', 'level': 2, 'used': False},
+            {'image': 'assets/level2/card15.jpg', 'correct_item': None, 'incorrect_item': 'Mouse', 'level': 2, 'used': False},
+            {'image': 'assets/level2/card16.jpg', 'correct_item': None, 'incorrect_item': 'Book', 'level': 2, 'used': False},
+            {'image': 'assets/level2/card17.jpg', 'correct_item': None, 'incorrect_item': 'Book', 'level': 2, 'used': False},
+            {'image': 'assets/level2/card18.jpg', 'correct_item': None, 'incorrect_item': 'Bottle', 'level': 2, 'used': False},
+            {'image': 'assets/level2/card19.jpg', 'correct_item': None, 'incorrect_item': 'Mouse', 'level': 2, 'used': False},
+            {'image': 'assets/level2/card20.jpg', 'correct_item': None, 'incorrect_item': 'Bottle', 'level': 2, 'used': False},
         ]
 
     def handle_item_selection(self, selected_item):
