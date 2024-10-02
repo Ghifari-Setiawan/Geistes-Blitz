@@ -10,9 +10,12 @@ from kivy.uix.label import Label
 from kivy.uix.gridlayout import GridLayout
 from kivy.core.window import Window
 from kivy.uix.behaviors import ButtonBehavior
+from kivy.graphics import PushMatrix, PopMatrix, Rotate, Translate
 from kivy.uix.videoplayer import VideoPlayer
-from kivy.core.audio import SoundLoader
+from kivy.uix.video import Video
 from kivy.animation import Animation
+from kivy.core.audio import SoundLoader
+from kivy.graphics import Ellipse, Color
 from kivy.uix.widget import Widget
 
 
@@ -82,10 +85,7 @@ class MainMenu(BaseScreen):
         popup_layout = FloatLayout()
 
         # Create the video widget and add it to the layout
-        video = VideoPlayer(source='assets/placeholder.mp4',size_hint=(0.9, 0.7), pos_hint={'center_x': 0.5, 'center_y': 0.6})
-        video.state = 'play'
-        video.options = {'eos': 'loop'}
-        video.allow_stretch = True
+        video = VideoPlayer(source='assets/placeholder.mp4', state='play', size_hint=(0.9, 0.7), pos_hint={'center_x': 0.5, 'center_y': 0.6})
         popup_layout.add_widget(video)
 
         # Create a close button to dismiss the popup
@@ -226,9 +226,9 @@ class GameScreen(BaseScreen):
         self.scores = [0] * self.num_players
         self.cards = []
         self.items = []
-        self.card_image_1 = None
-        self.card_image_2 = None
-        self.is_second_card_visible = False
+        self.card_image_1 = None  # Kartu pertama
+        self.card_image_2 = None  # Kartu kedua
+        self.is_second_card_visible = False  # Menandakan apakah kartu kedua sudah muncul
         self.create_game_layout()
         self.card_flip_sound = SoundLoader.load('assets/card_flip.wav')  # Load sound effect
         self.success_sound = SoundLoader.load('assets/success.wav')
@@ -241,20 +241,20 @@ class GameScreen(BaseScreen):
         self.cards = self.create_cards()
         self.current_card = self.cards[0]
 
-        # Add player labels and scores dynamically based on num_players
+        # Add player labels and scores
         self.player_labels = []
         self.score_labels = []
 
-
         for i in range(self.num_players):
-            player_label = Label(text=f"Player {i+1}", font_size=24, pos_hint=self.get_player_position(i))
-            score_label = Label(text=f"{self.scores[i]} pts", font_size=18, pos_hint=self.get_player_score_position(i))
+            player_label = Label(text=f"Player {i+1}", font_size=20, bold=True)
+            score_label = Label(text=f"Score: {self.scores[i]}", font_size=18)
+
+            self.layout.add_widget(player_label)
+            self.layout.add_widget(score_label)
 
             self.player_labels.append(player_label)
             self.score_labels.append(score_label)
-            self.layout.add_widget(player_label)
-            self.layout.add_widget(score_label)
-        
+
         self.update_player_labels_and_scores()  # Position the player labels and scores
 
         # Add first card at the center
@@ -312,18 +312,8 @@ class GameScreen(BaseScreen):
         """Animasi flip kartu (dummy, bisa ditambahkan animasi sebenarnya)."""
         print("Animasi flip kartu berjalan...")
 
-    def get_player_position(self, player_index):
-        """Calculate player label positions."""
-        positions = [{'center_x': 0.5, 'top': 0.9}, {'center_x': 0.1, 'center_y': 0.5}, 
-                    {'center_x': 0.5, 'y': 0.1}, {'center_x': 0.9, 'center_y': 0.5}]
-        return positions[player_index]
 
-    def get_player_score_position(self, player_index):
-        """Calculate score label positions."""
-        positions = [{'center_x': 0.5, 'top': 0.85}, {'center_x': 0.1, 'center_y': 0.45}, 
-                    {'center_x': 0.5, 'y': 0.15}, {'center_x': 0.9, 'center_y': 0.45}]
-        return positions[player_index]
-        
+
     def add_selection_buttons(self):
         """Creates item selection buttons for each player."""
         positions = [{'center_x': 0.53, 'center_y': 0.80},  # Player 1 (top)
@@ -346,61 +336,24 @@ class GameScreen(BaseScreen):
             self.layout.add_widget(button_layout)
 
     def update_player_labels_and_scores(self):
-        """Updates the player labels and scores."""
-        for i in range(4):
-            if i < self.num_players:
-                self.player_labels[i].text = f"Player {i+1}"
-                self.player_labels[i].opacity = 1  # Make it visible
-                self.score_labels[i].text = f"Score: {self.scores[i]}"
-                self.score_labels[i].opacity = 1
-            else:
-                # Hide labels for non-existent players
-                self.player_labels[i].opacity = 0
-                self.score_labels[i].opacity = 0
+        """Positions player labels and score labels."""
+        label_positions = [
+            {'center_x': 0.50, 'center_y': 0.95},  # Player 1 (top center)
+            {'center_x': 0.05, 'center_y': 0.500},  # Player 2 (left)
+            {'center_x': 0.50, 'y': -0.35},  # Player 3 (bottom center)
+            {'center_x': 0.95, 'center_y': 0.500},  # Player 4 (right)
+        ]
 
-        self.update_player_positions()
+        score_positions = [
+            {'center_x': 0.50, 'center_y': 0.90},
+            {'center_x': 0.05, 'center_y': 0.460},
+            {'center_x': 0.50, 'y': -0.40},
+            {'center_x': 0.95, 'center_y': 0.460},
+        ]
 
-    def update_player_positions(self):
-        """Repositions players dynamically based on the number of players and screen layout."""
-
-        if self.num_players == 2:
-            print("Permainan sudah dimulai dengan 2 Players!")
-            # Player 1 at the bottom, Player 2 at the top
-            self.player_labels[0].pos_hint = {'center_x': 0.5, 'center_y': 0.2}  # Centered near the bottom
-            self.score_labels[0].pos_hint = {'center_x': 0.5, 'center_y': 0.15}
-
-            self.player_labels[1].pos_hint = {'center_x': 0.5, 'center_y': 0.9}  # Centered near the top
-            self.score_labels[1].pos_hint = {'center_x': 0.5, 'center_y': 0.85}
-
-        elif self.num_players == 3:
-            print("Permainan sudah dimulai dengan 3 Players!")
-            # Player 1 at the bottom, Player 2 on the left, Player 3 on the right
-            self.player_labels[0].pos_hint = {'center_x': 0.5, 'center_y': 0.2}  # Bottom center
-            self.score_labels[0].pos_hint = {'center_x': 0.5, 'center_y': 0.15}
-
-            self.player_labels[1].pos_hint = {'center_x': 0.15, 'center_y': 0.5}  # Left center
-            self.score_labels[1].pos_hint = {'center_x': 0.15, 'center_y': 0.45}
-
-            self.player_labels[2].pos_hint = {'center_x': 0.85, 'center_y': 0.5}  # Right center
-            self.score_labels[2].pos_hint = {'center_x': 0.85, 'center_y': 0.45}
-
-        else:
-            print("Permainan sudah dimulai dengan 4 Players!")
-            # Player 1 at the bottom, Player 2 on the left, Player 3 on the top, Player 4 on the right
-            self.player_labels[0].pos_hint = {'center_x': 0.5, 'center_y': 0.2}  # Bottom center
-            self.score_labels[0].pos_hint = {'center_x': 0.5, 'center_y': 0.15}
-
-            self.player_labels[1].pos_hint = {'center_x': 0.15, 'center_y': 0.5}  # Left center
-            self.score_labels[1].pos_hint = {'center_x': 0.15, 'center_y': 0.45}
-
-            self.player_labels[2].pos_hint = {'center_x': 0.5, 'center_y': 0.8}  # Top center
-            self.score_labels[2].pos_hint = {'center_x': 0.5, 'center_y': 0.75}
-
-            self.player_labels[3].pos_hint = {'center_x': 0.85, 'center_y': 0.5}  # Right center
-            self.score_labels[3].pos_hint = {'center_x': 0.85, 'center_y': 0.45}
-
-
-
+        for i in range(self.num_players):
+            self.player_labels[i].pos_hint = label_positions[i]
+            self.score_labels[i].pos_hint = score_positions[i]
 
     def create_items(self):
         """Defines the available items with images."""
@@ -473,26 +426,30 @@ class GameScreen(BaseScreen):
         popup.open()
 
     def show_exit_popup(self, instance):
-        """Show a confirmation popup when the user presses the exit button."""
-        layout = FloatLayout()
+        """Displays a confirmation popup when the exit button is pressed."""
+        content = GridLayout(cols=1, spacing=2, padding=2)
+        yes_button = Button(text="Yes", size_hint=(1.1, 1.2))
+        no_button = Button(text="No", size_hint=(1.1, 1.2))
 
-        # Confirmation label
-        label = Label(text="Are you sure you want to exit?", font_size=24, pos_hint={'center_x': 0.5, 'center_y': 0.6})
-        layout.add_widget(label)
+        popup = Popup(
+            title="Exit Confirmation",
+            content=content,
+            size_hint=(0.6, 0.3)
+        )
 
-        # Yes button
-        yes_button = Button(text="Yes", size_hint=(0.3, 0.1), pos_hint={'center_x': 0.3, 'center_y': 0.4})
-        yes_button.bind(on_press=lambda _: (setattr(self.manager, 'current', 'main_menu'), exit_popup.dismiss()))  # Dismisses popup
-        layout.add_widget(yes_button)
+        yes_button.bind(on_press=lambda x: self.exit_game(popup))
+        no_button.bind(on_press=popup.dismiss)
 
-        # No button
-        no_button = Button(text="No", size_hint=(0.3, 0.1), pos_hint={'center_x': 0.7, 'center_y': 0.4})
-        no_button.bind(on_press=lambda _: exit_popup.dismiss())
-        layout.add_widget(no_button)
+        content.add_widget(Label(text="Are you sure you want to exit?"))
+        content.add_widget(yes_button)
+        content.add_widget(no_button)
 
-        # Create and open popup
-        exit_popup = Popup(title='Confirm Exit', content=layout, size_hint=(0.8, 0.4))
-        exit_popup.open()
+        popup.open()
+
+    def exit_game(self, popup):
+        """Exits the game and returns to the main menu."""
+        popup.dismiss()
+        self.manager.current = 'MainMenu'
 
 
 # Build the app and screen manager
