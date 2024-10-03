@@ -223,15 +223,25 @@ class GameScreen(BaseScreen):
         self.num_players = 4  # Default to 4 players
         self.current_card_index = 0
         self.player_turn = 0
-        self.scores = [0] * self.num_players
-        self.cards = []
-        self.items = []
+        self.is_second_card_visible = False
+        self.current_player_index = 0
+        self.scores = [0] * self.num_players  # Initialize player scores
+        self.cards = self.create_cards()  # Initialize the cards
+        self.create_game_layout()  # Create the game layout
+        self.reset_game()  # Initialize the game at the start
+
+    def reset_game(self):
+        """Resets the game state, including cards and scores."""
+        self.current_card_index = 0
+        self.player_turn = 0
+        self.scores = [0] * self.num_players  # Reset scores
+        self.cards = self.create_cards()  # Reset cards
         self.card_image_1 = None
         self.card_image_2 = None
         self.is_second_card_visible = False
-        self.create_game_layout()
-        self.card_flip_sound = SoundLoader.load('assets/card_flip.wav')  # Load sound effect
-        self.success_sound = SoundLoader.load('assets/success.wav')
+        self.current_player_index = 0
+        self.update_player_labels_and_scores()
+        self.update_card()
 
     def create_game_layout(self):
         self.layout = FloatLayout()
@@ -266,7 +276,6 @@ class GameScreen(BaseScreen):
         self.layout.add_widget(self.cards_left_label)
 
         # Add selection buttons
-        self.selection_buttons = [[] for _ in range(self.num_players)]  # To store buttons per player
         self.add_selection_buttons()
 
         # Add an exit button below the center card
@@ -289,24 +298,24 @@ class GameScreen(BaseScreen):
 
         # Panggil animasi flip kartu (optional)
         self.animate_card_flip()
+        self.update_next_card()
 
-        # Update kartu yang ditampilkan
+    def update_next_card(self):
+        """Moves to the next card."""
         self.current_card_index += 1
         if self.current_card_index < len(self.cards):
             if not self.is_second_card_visible:
-                # Jika kartu kedua belum muncul, tampilkan kartu kedua
                 self.card_image_2 = self.add_card_at_position(self.cards[self.current_card_index], pos_hint={'center_x': 0.6, 'center_y': 0.50})
                 self.is_second_card_visible = True
             else:
                 # Jika kedua kartu sudah muncul, ganti gambar dari kedua kartu tersebut
                 if self.current_card_index < len(self.cards):
                     self.card_image_2.source = self.cards[self.current_card_index]['image']
-
-            # Update label jumlah kartu yang tersisa
             self.cards_left_label.text = f"Cards Left: {len(self.cards) - self.current_card_index}"
 
         else:
-            print("Semua kartu sudah digunakan.")
+            print("All cards have been used.")
+            self.display_scores()
 
     def animate_card_flip(self):
         """Animasi flip kartu (dummy, bisa ditambahkan animasi sebenarnya)."""
@@ -340,7 +349,6 @@ class GameScreen(BaseScreen):
                 item_button = Button(background_normal=item['image'], size_hint=(None, None), size=(64, 64))
                 item_button.bind(on_release=lambda btn, item=item: self.handle_item_selection(item))
                 button_layout.add_widget(item_button)
-                self.selection_buttons[i].append(item_button)
 
             button_layout.pos_hint = positions[i]
             self.layout.add_widget(button_layout)
@@ -438,9 +446,6 @@ class GameScreen(BaseScreen):
         ]
 
     def handle_item_selection(self, selected_item):
-        global remaining_cards
-        global current_player_index
-
         # Check current card level and validate selection
         if self.current_card['level'] == 1:
             if selected_item['name'] == self.current_card['correct_item']:
@@ -457,30 +462,40 @@ class GameScreen(BaseScreen):
 
         # Move to the next card or end the game
         next_card = next((card for card in self.cards if not card['used']), None)
+        
         if next_card:
             self.current_card = next_card  # Update the current card
             self.current_card['used'] = True  # Mark it as used
-            remaining_cards -= 1
         else:
             print("No Cards Remaining!")
             self.display_scores()  # Display final scores when the game ends
             return
 
         # Move to the next player
-        current_player_index = (current_player_index + 1) % self.num_players
+        self.current_player_index = (self.current_player_index + 1) % self.num_players  # Fixed reference
 
         # Update the game screen to reflect the new state (current card and scores)
+        self.update_card_indicator()  # Update cards left
         self.update_card()  # Update the displayed card
         self.update_player_labels_and_scores()  # Refresh player labels and scores
 
     def update_card(self):
         """Updates the displayed card image."""
-        self.card_image.source = self.current_card['image']
+        if self.is_second_card_visible:
+            # Update the second card if it's visible
+            self.card_image_2.source = self.current_card['image']
         self.update_card_indicator()
 
     def update_card_indicator(self):
-        """Updates the card indicator label."""
-        self.cards_left_label.text = f"Cards Left: {len(self.cards) - self.current_card_index}"
+        """Updates the card indicator label with the correct remaining card count."""
+        cards_left = len([card for card in self.cards if not card['used']])
+        
+        # Prevent negative count (though this should rarely happen now)
+        if cards_left < 0:
+            cards_left = 0
+
+        # Update the label text to reflect the cards left
+        self.cards_left_label.text = f"Cards Left: {cards_left}"
 
     def display_scores(self):
         """Displays the final scores when the game ends."""
@@ -498,7 +513,7 @@ class GameScreen(BaseScreen):
 
         # Yes button
         yes_button = Button(text="Yes", size_hint=(0.3, 0.1), pos_hint={'center_x': 0.3, 'center_y': 0.4})
-        yes_button.bind(on_press=lambda _: (setattr(self.manager, 'current', 'main_menu'), exit_popup.dismiss()))  # Dismisses popup
+        yes_button.bind(on_press=lambda _: (self.reset_game(), setattr(self.manager, 'current', 'main_menu'), exit_popup.dismiss()))  # Reset the game on exit
         layout.add_widget(yes_button)
 
         # No button
