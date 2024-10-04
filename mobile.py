@@ -14,6 +14,7 @@ from kivy.uix.videoplayer import VideoPlayer
 from kivy.core.audio import SoundLoader
 from kivy.animation import Animation
 from kivy.uix.widget import Widget
+from kivy.uix.boxlayout import BoxLayout
 
 
 # Set window size at the start
@@ -498,9 +499,28 @@ class GameScreen(BaseScreen):
         self.cards_left_label.text = f"Cards Left: {cards_left}"
 
     def display_scores(self):
-        """Displays the final scores when the game ends."""
+        """Displays the final scores when the game ends with options to restart or return to the main menu."""
+        
+        # Create score text
         score_text = "\n".join([f"Player {i+1}: {self.scores[i]} points" for i in range(self.num_players)])
-        popup = Popup(title='Game Over', content=Label(text=score_text), size_hint=(0.5, 0.5))
+        score_label = Label(text=score_text)
+
+        # Create buttons for "Restart Game" and "Main Menu"
+        restart_button = Button(text="Restart Game", size_hint=(1, 0.2))
+        main_menu_button = Button(text="Main Menu", size_hint=(1, 0.2))
+        
+        # Define the actions for the buttons
+        restart_button.bind(on_press=lambda _: (self.reset_game(), popup.dismiss()))
+        main_menu_button.bind(on_press=lambda _: (self.reset_game(), setattr(self.manager, 'current', 'main_menu'), popup.dismiss()))
+
+        # Create a layout for the buttons and score label
+        box_layout = BoxLayout(orientation='vertical', padding=10, spacing=10)
+        box_layout.add_widget(score_label)
+        box_layout.add_widget(restart_button)
+        box_layout.add_widget(main_menu_button)
+
+        # Create and open the popup
+        popup = Popup(title='Game Over', content=box_layout, size_hint=(0.6, 0.6))
         popup.open()
 
     def show_exit_popup(self, instance):
