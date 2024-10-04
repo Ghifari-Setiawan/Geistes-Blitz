@@ -508,16 +508,16 @@ class GameScreen(BaseScreen):
         layout = FloatLayout()
 
         # Confirmation label
-        label = Label(text="Are you sure you want to exit?", font_size=24, pos_hint={'center_x': 0.5, 'center_y': 0.6})
+        label = Label(text="Quit Game", font_size=24, pos_hint={'center_x': 0.5, 'center_y': 0.6})
         layout.add_widget(label)
 
         # Yes button
-        yes_button = Button(text="Yes", size_hint=(0.3, 0.1), pos_hint={'center_x': 0.3, 'center_y': 0.4})
+        yes_button = Button(text="Yes", size_hint=(0.25, 0.25), pos_hint={'center_x': 0.3, 'center_y': 0.3})
         yes_button.bind(on_press=lambda _: (self.reset_game(), setattr(self.manager, 'current', 'main_menu'), exit_popup.dismiss()))  # Reset the game on exit
         layout.add_widget(yes_button)
 
         # No button
-        no_button = Button(text="No", size_hint=(0.3, 0.1), pos_hint={'center_x': 0.7, 'center_y': 0.4})
+        no_button = Button(text="No", size_hint=(0.25, 0.25), pos_hint={'center_x': 0.7, 'center_y': 0.3})
         no_button.bind(on_press=lambda _: exit_popup.dismiss())
         layout.add_widget(no_button)
 
