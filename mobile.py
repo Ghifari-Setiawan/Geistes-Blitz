@@ -528,7 +528,7 @@ class GameScreen(BaseScreen):
         layout = FloatLayout()
 
         # Confirmation label
-        label = Label(text="Quit Game", font_size=24, pos_hint={'center_x': 0.5, 'center_y': 0.6})
+        label = Label(text="Quit Game", font_size=28, pos_hint={'center_x': 0.5, 'center_y': 0.9})
         layout.add_widget(label)
 
         # Yes button
