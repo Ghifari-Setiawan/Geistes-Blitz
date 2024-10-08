@@ -82,11 +82,21 @@ class MainMenu(BaseScreen):
         # Create a layout for the popup
         popup_layout = FloatLayout()
 
-        # Create the video widget and add it to the layout
-        video = VideoPlayer(source='assets/placeholder.mp4',size_hint=(0.9, 0.7), pos_hint={'center_x': 0.5, 'center_y': 0.6})
+       # Create the video widget and add it to the layout
+        video = VideoPlayer(source='assets/placeholder.mp4',
+                        size_hint=(0.9, 0.7), 
+                        pos_hint={'center_x': 0.5, 'center_y': 0.6})
+
+        # Ensure the video starts in play mode
         video.state = 'play'
+        
+        # Loop the video when it ends
         video.options = {'eos': 'loop'}
+
+        # Allow the video to stretch to fit the layout
         video.allow_stretch = True
+
+        # Add the video player to the popup layout
         popup_layout.add_widget(video)
 
         # Create a close button to dismiss the popup
@@ -95,8 +105,15 @@ class MainMenu(BaseScreen):
 
         # Create a popup to show the video
         popup = Popup(title='How to Play', content=popup_layout, size_hint=(0.8, 0.8))
-        close_button.bind(on_press=popup.dismiss)
 
+        # Bind the close button and stop the video when closing the popup
+        def close_popup(instance):
+            video.state = 'stop'  # Stop the video when the popup is closed
+            popup.dismiss()
+
+        close_button.bind(on_press=close_popup)
+
+        # Open the popup
         popup.open()
 
 # Player selection screen
