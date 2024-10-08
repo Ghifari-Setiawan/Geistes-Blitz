@@ -303,7 +303,6 @@ class GameScreen(BaseScreen):
 
     def update_next_card(self):
         """Moves to the next card."""
-        self.current_card_index += 1
         if self.current_card_index < len(self.cards):
             if not self.is_second_card_visible:
                 self.card_image_2 = self.add_card_at_position(self.cards[self.current_card_index], pos_hint={'center_x': 0.6, 'center_y': 0.50})
@@ -340,18 +339,31 @@ class GameScreen(BaseScreen):
                      {'center_x': 0.25, 'center_y': 0.65},  # Player 2 (left)
                      {'center_x': 0.53, 'y': 0.10},  # Player 3 (bottom)
                      {'center_x': 1.00, 'center_y': 0.65}]  # Player 4 (right)
+        
+         # Filter the positions based on the number of players
+        if self.num_players == 2:
+            # Show top (Player 1) and bottom (Player 3) positions for 2 players
+            positions = [positions[0], positions[2]]
+        elif self.num_players == 3:
+            # Show top, left, and bottom positions for 3 players
+            positions = [positions[0], positions[1], positions[2]]
 
-        # For each player, create item buttons around their position
+        # For each player, create item buttons at their respective position
         for i in range(self.num_players):
             # Adjust item button layout based on player index
             button_layout = GridLayout(cols=5 if i % 2 == 0 else 1, size_hint=(None, None), width=400, height=100)
 
+            # Add buttons for items available to the player
             for item in self.items:
                 item_button = Button(background_normal=item['image'], size_hint=(None, None), size=(64, 64))
+                # Bind button press to handle selection for this specific player
                 item_button.bind(on_release=lambda btn, item=item: self.handle_item_selection(item))
                 button_layout.add_widget(item_button)
 
+            # Set the position for the button layout according to the player's position
             button_layout.pos_hint = positions[i]
+
+            # Add the button layout to the main layout
             self.layout.add_widget(button_layout)
 
     def update_player_labels_and_scores(self):
@@ -447,38 +459,46 @@ class GameScreen(BaseScreen):
         ]
 
     def handle_item_selection(self, selected_item):
+        # Flag to check if the card should update
+        correct_selection = False
+
         # Check current card level and validate selection
         if self.current_card['level'] == 1:
             if selected_item['name'] == self.current_card['correct_item']:
                 self.scores[self.player_turn] += 1  # Increase score for current player
                 print(f"Player {self.player_turn + 1} selected the correct item!")
+                correct_selection = True  # Only allow card update if selection is correct
             else:
                 print(f"Player {self.player_turn + 1} selected the wrong item!")
         elif self.current_card['level'] == 2:
             if selected_item['name'] == self.current_card['incorrect_item']:
                 self.scores[self.player_turn] += 1
                 print(f"Player {self.player_turn + 1} selected the correct item!")
+                correct_selection = True  # Allow card update on correct selection
             else:
                 print(f"Player {self.player_turn + 1} selected the wrong item!")
 
-        # Move to the next card or end the game
-        next_card = next((card for card in self.cards if not card['used']), None)
-        
-        if next_card:
-            self.current_card = next_card  # Update the current card
-            self.current_card['used'] = True  # Mark it as used
+        # Update to the next card only if the selection was correct
+        if correct_selection:
+            next_card = next((card for card in self.cards if not card['used']), None)
+            
+            if next_card:
+                self.current_card = next_card  # Update the current card
+                self.current_card['used'] = True  # Mark it as used
+            else:
+                print("No Cards Remaining!")
+                self.display_scores()  # Display final scores when the game ends
         else:
-            print("No Cards Remaining!")
-            self.display_scores()  # Display final scores when the game ends
-            return
+            # Provide feedback for incorrect selection, card remains the same
+            print("The card remains unchanged as the selection was incorrect.")
 
-        # Move to the next player
-        self.current_player_index = (self.current_player_index + 1) % self.num_players  # Fixed reference
+            # Move to the next player
+            self.current_player_index = (self.current_player_index + 1) % self.num_players  # Fixed reference
 
-        # Update the game screen to reflect the new state (current card and scores)
-        self.update_card_indicator()  # Update cards left
-        self.update_card()  # Update the displayed card
-        self.update_player_labels_and_scores()  # Refresh player labels and scores
+            # Update the game screen to reflect the new state (current card and scores)
+            self.update_card_indicator()  # Update cards left
+            self.update_card()  # Update the displayed card
+            self.update_player_labels_and_scores()  # Refresh player labels and scores
 
     def update_card(self):
         """Updates the displayed card image."""
@@ -528,7 +548,7 @@ class GameScreen(BaseScreen):
         layout = FloatLayout()
 
         # Confirmation label
-        label = Label(text="Quit Game", font_size=28, pos_hint={'center_x': 0.5, 'center_y': 0.9})
+        label = Label(text="Quit Game", font_size=28, pos_hint={'center_x': 0.5, 'center_y': 0.75})
         layout.add_widget(label)
 
         # Yes button
