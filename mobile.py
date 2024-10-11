@@ -418,7 +418,7 @@ class GameScreen(BaseScreen):
     def update_player_positions(self):
         """Repositions players dynamically based on the number of players and screen layout."""
 
-        if range(self.num_player_count) == 2:
+        if self.num_players == 2:
             print("Permainan sudah dimulai dengan 2 Players!")
             # Player 1 at the bottom, Player 2 at the top
             self.player_labels[0].pos_hint = {'center_x': 0.5, 'center_y': 0.130}  # Centered near the bottom
@@ -427,7 +427,7 @@ class GameScreen(BaseScreen):
             self.player_labels[1].pos_hint = {'center_x': 0.5, 'center_y': 0.95}  # Centered near the top
             self.score_labels[1].pos_hint = {'center_x': 0.5, 'center_y': 0.90}
 
-        elif range(self.num_player_count) == 3:
+        elif self.num_player_count == 3:
             print("Permainan sudah dimulai dengan 3 Players!")
             # Player 1 at the bottom, Player 2 on the left, Player 3 on the right
             self.player_labels[0].pos_hint = {'center_x': 0.5, 'center_y': 0.130}  # Bottom center
@@ -439,7 +439,7 @@ class GameScreen(BaseScreen):
             self.player_labels[2].pos_hint = {'center_x': 0.95, 'center_y': 0.5}  # Right center
             self.score_labels[2].pos_hint = {'center_x': 0.95, 'center_y': 0.45}
 
-        else:
+        elif self.num_player_count == 4:
             print("Permainan sudah dimulai dengan 4 Players!")
             # Player 1 at the bottom, Player 2 on the left, Player 3 on the top, Player 4 on the right
             self.player_labels[0].pos_hint = {'center_x': 0.5, 'center_y': 0.130}  # Bottom center
@@ -498,13 +498,13 @@ class GameScreen(BaseScreen):
         if self.current_card['level'] == 1:
             if selected_item['name'] == self.current_card['correct_item']:
                 self.scores[player_id] += 1  # Increase score for the player who selected the correct item
-                print(f"Player {player_id + 1} selected the correct item!")
+                print(f"Player {player_id + 1} selected the correct item! Their score is now {self.scores[player_id]}.")
             else:
                 print(f"Player {player_id + 1} selected the wrong item!")
         elif self.current_card['level'] == 2:
             if selected_item['name'] == self.current_card['incorrect_item']:
                 self.scores[player_id] += 1
-                print(f"Player {player_id + 1} selected the correct item!")
+                print(f"Player {player_id + 1} selected the correct item! Their score is now {self.scores[player_id]}.")
             else:
                 print(f"Player {player_id + 1} selected the wrong item!")
 
@@ -524,6 +524,7 @@ class GameScreen(BaseScreen):
             return
         
         self.update_next_card()
+        self.update_player_labels_and_scores()
 
 
     def update_card(self):
