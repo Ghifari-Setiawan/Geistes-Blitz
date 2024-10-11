@@ -365,9 +365,10 @@ class GameScreen(BaseScreen):
         
     def add_selection_buttons(self):
         """Creates item selection buttons for each player."""
-        positions = [{'center_x': 0.53, 'center_y': 0.80},  # Player 1 (top)
+        positions = [
+                    {'center_x': 0.53, 'y': 0.10},         # Player 1 (top)
                     {'center_x': 0.25, 'center_y': 0.65},  # Player 2 (left)
-                    {'center_x': 0.53, 'y': 0.10},         # Player 3 (bottom)
+                    {'center_x': 0.53, 'center_y': 0.80},  # Player 3 (buttom)
                     {'center_x': 1.00, 'center_y': 0.65}]  # Player 4 (right)
 
         items = self.create_items()  # Get the list of items with 'name' and 'image'
@@ -388,7 +389,7 @@ class GameScreen(BaseScreen):
             # Add buttons for each item available to the player
             for item in items:
                 # Create buttons/items for each player, with on_press sending the item and player_id
-                item_button = Button(background_normal=item['image'], size_hint=(None, None), size=(100, 50),
+                item_button = Button(background_normal=item['image'], size_hint=(None, None), size=(70, 60),
                                     on_press=lambda btn, item=item, player_id=self.num_players[i]['id']: self.on_item_click(item, player_id))
                 button_layout.add_widget(item_button)  # Add the item_button to the button_layout
 
