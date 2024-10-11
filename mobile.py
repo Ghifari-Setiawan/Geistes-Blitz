@@ -15,6 +15,7 @@ from kivy.core.audio import SoundLoader
 from kivy.animation import Animation
 from kivy.uix.widget import Widget
 from kivy.uix.boxlayout import BoxLayout
+import random
 
 
 # Set window size at the start
@@ -238,12 +239,13 @@ class Confetti(Widget):
 class GameScreen(BaseScreen):
     def __init__(self, **kwargs):
         super(GameScreen, self).__init__(**kwargs)
-        self.num_players = 4  # Default to 4 players
+        self.num_players = [{'id': 0, 'name': 'Player 1'}, {'id': 1, 'name': 'Player 2'}, {'id': 2, 'name': 'Player 3'}, {'id': 3, 'name': 'Player 4'}]
+        self.num_player_count = len(self.num_players)  # Separate count
+        self.scores = [0] * self.num_player_count  # Initialize player scores
         self.current_card_index = 0
         self.player_turn = 0
         self.is_second_card_visible = False
         self.current_player_index = 0
-        self.scores = [0] * self.num_players  # Initialize player scores
         self.cards = self.create_cards()  # Initialize the cards
         self.create_game_layout()  # Create the game layout
         self.reset_game()  # Initialize the game at the start
@@ -252,7 +254,7 @@ class GameScreen(BaseScreen):
         """Resets the game state, including cards and scores."""
         self.current_card_index = 0
         self.player_turn = 0
-        self.scores = [0] * self.num_players  # Reset scores
+        self.scores = [0] * self.num_player_count  # Initialize player scores
         self.cards = self.create_cards()  # Reset cards
         self.card_image_1 = None
         self.card_image_2 = None
@@ -274,7 +276,8 @@ class GameScreen(BaseScreen):
         self.score_labels = []
 
 
-        for i in range(self.num_players):
+        # Iterate using the length of the list
+        for i in range(self.num_player_count):  # Corrected line
             player_label = Label(text=f"Player {i+1}", font_size=24, pos_hint=self.get_player_position(i))
             score_label = Label(text=f"{self.scores[i]} pts", font_size=18, pos_hint=self.get_player_score_position(i))
 
@@ -282,8 +285,9 @@ class GameScreen(BaseScreen):
             self.score_labels.append(score_label)
             self.layout.add_widget(player_label)
             self.layout.add_widget(score_label)
-        
+
         self.update_player_labels_and_scores()  # Position the player labels and scores
+
 
         # Add first card at the center
         self.card_image_1 = self.add_card_at_position(self.cards[self.current_card_index], pos_hint={'center_x': 0.4, 'center_y': 0.50})
@@ -320,19 +324,28 @@ class GameScreen(BaseScreen):
 
     def update_next_card(self):
         """Moves to the next card."""
+        self.current_card_index += 1  # Increment the current card index
+
+        # Check if there are remaining cards
         if self.current_card_index < len(self.cards):
+            # Update the current card object
+            self.current_card = self.cards[self.current_card_index]
+            
+            # Check if a second card should be visible and update its image
             if not self.is_second_card_visible:
                 self.card_image_2 = self.add_card_at_position(self.cards[self.current_card_index], pos_hint={'center_x': 0.6, 'center_y': 0.50})
                 self.is_second_card_visible = True
             else:
-                # Jika kedua kartu sudah muncul, ganti gambar dari kedua kartu tersebut
-                if self.current_card_index < len(self.cards):
-                    self.card_image_2.source = self.cards[self.current_card_index]['image']
+                # Change the second card image if it's already visible
+                self.card_image_2.source = self.current_card['image']
+
+            # Update the card indicator label
             self.cards_left_label.text = f"Cards Left: {len(self.cards) - self.current_card_index}"
 
         else:
             print("All cards have been used.")
             self.display_scores()
+
 
     def animate_card_flip(self):
         """Animasi flip kartu (dummy, bisa ditambahkan animasi sebenarnya)."""
@@ -353,29 +366,31 @@ class GameScreen(BaseScreen):
     def add_selection_buttons(self):
         """Creates item selection buttons for each player."""
         positions = [{'center_x': 0.53, 'center_y': 0.80},  # Player 1 (top)
-                     {'center_x': 0.25, 'center_y': 0.65},  # Player 2 (left)
-                     {'center_x': 0.53, 'y': 0.10},  # Player 3 (bottom)
-                     {'center_x': 1.00, 'center_y': 0.65}]  # Player 4 (right)
-        
-         # Filter the positions based on the number of players
-        if self.num_players == 2:
+                    {'center_x': 0.25, 'center_y': 0.65},  # Player 2 (left)
+                    {'center_x': 0.53, 'y': 0.10},         # Player 3 (bottom)
+                    {'center_x': 1.00, 'center_y': 0.65}]  # Player 4 (right)
+
+        items = self.create_items()  # Get the list of items with 'name' and 'image'
+
+        # Filter the positions based on the number of players
+        if self.num_player_count == 2:
             # Show top (Player 1) and bottom (Player 3) positions for 2 players
             positions = [positions[0], positions[2]]
-        elif self.num_players == 3:
+        elif self.num_player_count == 3:
             # Show top, left, and bottom positions for 3 players
             positions = [positions[0], positions[1], positions[2]]
 
         # For each player, create item buttons at their respective position
-        for i in range(self.num_players):
+        for i in range(self.num_player_count):
             # Adjust item button layout based on player index
             button_layout = GridLayout(cols=5 if i % 2 == 0 else 1, size_hint=(None, None), width=400, height=100)
 
-            # Add buttons for items available to the player
-            for item in self.items:
-                item_button = Button(background_normal=item['image'], size_hint=(None, None), size=(64, 64))
-                # Bind button press to handle selection for this specific player
-                item_button.bind(on_release=lambda btn, item=item: self.handle_item_selection(item))
-                button_layout.add_widget(item_button)
+            # Add buttons for each item available to the player
+            for item in items:
+                # Create buttons/items for each player, with on_press sending the item and player_id
+                item_button = Button(background_normal=item['image'], size_hint=(None, None), size=(100, 50),
+                                    on_press=lambda btn, item=item, player_id=self.num_players[i]['id']: self.on_item_click(item, player_id))
+                button_layout.add_widget(item_button)  # Add the item_button to the button_layout
 
             # Set the position for the button layout according to the player's position
             button_layout.pos_hint = positions[i]
@@ -383,25 +398,26 @@ class GameScreen(BaseScreen):
             # Add the button layout to the main layout
             self.layout.add_widget(button_layout)
 
+
     def update_player_labels_and_scores(self):
         """Updates the player labels and scores."""
-        for i in range(4):
-            if i < self.num_players:
-                self.player_labels[i].text = f"Player {i+1}"
-                self.player_labels[i].opacity = 1  # Make it visible
-                self.score_labels[i].text = f"Score: {self.scores[i]}"
-                self.score_labels[i].opacity = 1
-            else:
-                # Hide labels for non-existent players
-                self.player_labels[i].opacity = 0
-                self.score_labels[i].opacity = 0
+        for i in range(self.num_player_count):  # Use len(self.num_players)
+            self.player_labels[i].text = f"Player {i+1}"
+            self.player_labels[i].opacity = 1  # Make it visible
+            self.score_labels[i].text = f"Score: {self.scores[i]}"
+            self.score_labels[i].opacity = 1
+
+        # Hide labels for non-existent players (if any)
+        for i in range(self.num_player_count, 4):  # Handles up to 4 players
+            self.player_labels[i].opacity = 0
+            self.score_labels[i].opacity = 0
 
         self.update_player_positions()
 
     def update_player_positions(self):
         """Repositions players dynamically based on the number of players and screen layout."""
 
-        if self.num_players == 2:
+        if range(self.num_player_count) == 2:
             print("Permainan sudah dimulai dengan 2 Players!")
             # Player 1 at the bottom, Player 2 at the top
             self.player_labels[0].pos_hint = {'center_x': 0.5, 'center_y': 0.130}  # Centered near the bottom
@@ -410,7 +426,7 @@ class GameScreen(BaseScreen):
             self.player_labels[1].pos_hint = {'center_x': 0.5, 'center_y': 0.95}  # Centered near the top
             self.score_labels[1].pos_hint = {'center_x': 0.5, 'center_y': 0.90}
 
-        elif self.num_players == 3:
+        elif range(self.num_player_count) == 3:
             print("Permainan sudah dimulai dengan 3 Players!")
             # Player 1 at the bottom, Player 2 on the left, Player 3 on the right
             self.player_labels[0].pos_hint = {'center_x': 0.5, 'center_y': 0.130}  # Bottom center
@@ -438,7 +454,8 @@ class GameScreen(BaseScreen):
             self.score_labels[3].pos_hint = {'center_x': 0.95, 'center_y': 0.45}
 
 
-
+    def on_item_click(self, selected_item, player_id):
+        self.handle_item_selection(selected_item, player_id)
 
     def create_items(self):
         """Defines the available items with images."""
@@ -475,47 +492,38 @@ class GameScreen(BaseScreen):
             {'image': 'assets/level2/card20.jpg', 'correct_item': None, 'incorrect_item': 'Bottle', 'level': 2, 'used': False},
         ]
 
-    def handle_item_selection(self, selected_item):
-        # Flag to check if the card should update
-        correct_selection = False
-
-        # Check current card level and validate selection
+    def handle_item_selection(self, selected_item, player_id):
+        # Check if the selected item is correct based on the card's level
         if self.current_card['level'] == 1:
             if selected_item['name'] == self.current_card['correct_item']:
-                self.scores[self.player_turn] += 1  # Increase score for current player
-                print(f"Player {self.player_turn + 1} selected the correct item!")
-                correct_selection = True  # Only allow card update if selection is correct
+                self.scores[player_id] += 1  # Increase score for the player who selected the correct item
+                print(f"Player {player_id + 1} selected the correct item!")
             else:
-                print(f"Player {self.player_turn + 1} selected the wrong item!")
+                print(f"Player {player_id + 1} selected the wrong item!")
         elif self.current_card['level'] == 2:
             if selected_item['name'] == self.current_card['incorrect_item']:
-                self.scores[self.player_turn] += 1
-                print(f"Player {self.player_turn + 1} selected the correct item!")
-                correct_selection = True  # Allow card update on correct selection
+                self.scores[player_id] += 1
+                print(f"Player {player_id + 1} selected the correct item!")
             else:
-                print(f"Player {self.player_turn + 1} selected the wrong item!")
+                print(f"Player {player_id + 1} selected the wrong item!")
 
-        # Update to the next card only if the selection was correct
-        if correct_selection:
-            next_card = next((card for card in self.cards if not card['used']), None)
+        # Get the list of unused cards
+        unused_cards = [card for card in self.cards if not card['used']]
+
+        if unused_cards:
+            # Shuffle the unused cards
+            random.shuffle(unused_cards)
             
-            if next_card:
-                self.current_card = next_card  # Update the current card
-                self.current_card['used'] = True  # Mark it as used
-            else:
-                print("No Cards Remaining!")
-                self.display_scores()  # Display final scores when the game ends
+            # Pick the next card randomly from the shuffled list
+            self.current_card = unused_cards[0]  
+            self.current_card['used'] = True  # Mark the card as used
         else:
-            # Provide feedback for incorrect selection, card remains the same
-            print("The card remains unchanged as the selection was incorrect.")
+            print("No Cards Remaining!")
+            self.display_scores()  # Display final scores when the game ends
+            return
+        
+        self.update_next_card()
 
-            # Move to the next player
-            self.current_player_index = (self.current_player_index + 1) % self.num_players  # Fixed reference
-
-            # Update the game screen to reflect the new state (current card and scores)
-            self.update_card_indicator()  # Update cards left
-            self.update_card()  # Update the displayed card
-            self.update_player_labels_and_scores()  # Refresh player labels and scores
 
     def update_card(self):
         """Updates the displayed card image."""
@@ -539,7 +547,7 @@ class GameScreen(BaseScreen):
         """Displays the final scores when the game ends with options to restart or return to the main menu."""
         
         # Create score text
-        score_text = "\n".join([f"Player {i+1}: {self.scores[i]} points" for i in range(self.num_players)])
+        score_text = "\n".join([f"Player {i+1}: {self.scores[i]} points" for i in range(self.num_player_count)])
         score_label = Label(text=score_text)
 
         # Create buttons for "Restart Game" and "Main Menu"
