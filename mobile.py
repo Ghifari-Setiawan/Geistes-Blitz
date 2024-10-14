@@ -211,29 +211,55 @@ def animate_card_flip(self):
         self.on_player_win(self.player_turn)
 
 
-def trigger_confetti_animation(self):
-    for _ in range(50):  # Create multiple confetti pieces
-        confetti = Confetti()
-        self.layout.add_widget(confetti)
-        confetti.animate()
-
 class Confetti(Widget):
     def __init__(self, **kwargs):
         super(Confetti, self).__init__(**kwargs)
         self.image = Image(source="assets/confetti.png", size_hint=(None, None), size=(30, 30))
         self.add_widget(self.image)
-        self.image.pos = (randint(0, Window.width), Window.height)  # Start from top
+        self.image.pos = (randint(0, Window.width), Window.height)  # Mulai dari atas
 
     def animate(self):
-        # Animate the confetti falling down
+        # Animasikan confetti jatuh ke bawah
         end_pos = (self.image.x, 0)
-        anim = Animation(pos=end_pos, duration=2, t='out_bounce')
+        anim = Animation(pos=end_pos, duration=3, t='out_bounce')  # Durasi lebih panjang agar terlihat
         anim.bind(on_complete=self.remove_confetti)
         anim.start(self.image)
 
     def remove_confetti(self, *args):
-        # Remove confetti once it reaches the bottom
+        # Menghapus confetti setelah sampai di bawah
         self.parent.remove_widget(self)
+
+
+class GameOverScreen(Screen):
+    def __init__(self, **kwargs):
+        super(GameOverScreen, self).__init__(**kwargs)
+        self.layout = FloatLayout()  # Gunakan FloatLayout agar widget bisa bergerak
+        self.add_widget(self.layout)
+
+    def on_enter(self):
+        print("Game Over Screen entered")  # Memastikan layar Game Over muncul
+        self.trigger_confetti_animation()  # Memicu animasi confetti saat layar Game Over muncul
+
+    def trigger_confetti_animation(self):
+        for _ in range(50):  # Membuat 50 confetti
+            confetti = Confetti()
+            self.layout.add_widget(confetti)
+            confetti.animate()
+
+
+class GameApp(App):
+    def build(self):
+        sm = ScreenManager()
+        sm.add_widget(GameOverScreen(name='game_over_screen'))
+        return sm
+
+    def on_start(self):
+        # Simulasi memanggil layar Game Over setelah aplikasi dimulai
+        Clock.schedule_once(self.show_game_over, 2)
+
+    def show_game_over(self, dt):
+        # Pindah ke layar Game Over dan memicu animasi confetti
+        self.root.current = 'game_over_screen'
 
 
 class GameScreen(BaseScreen):
