@@ -9,6 +9,7 @@ from kivy.uix.screenmanager import ScreenManager, Screen
 from kivy.uix.label import Label
 from kivy.uix.gridlayout import GridLayout
 from kivy.core.window import Window
+from kivy.logger import Logger
 from kivy.uix.behaviors import ButtonBehavior
 from kivy.uix.videoplayer import VideoPlayer
 from kivy.core.audio import SoundLoader
@@ -83,8 +84,10 @@ class MainMenu(BaseScreen):
         # Create a layout for the popup
         popup_layout = FloatLayout()
 
+        Logger.info("Loading video from: {}".format('./assets/pkl record 1.mp4'))
+        
        # Create the video widget and add it to the layout
-        video = VideoPlayer(source='assets/placeholder.mp4',
+        video = VideoPlayer(source='./assets/pkl record 1.mp4',
                         size_hint=(0.9, 0.7), 
                         pos_hint={'center_x': 0.5, 'center_y': 0.6})
 
@@ -453,6 +456,11 @@ class GameScreen(BaseScreen):
             self.player_labels[1].pos_hint = {'center_x': 0.5, 'center_y': 0.95}  # Centered near the top
             self.score_labels[1].pos_hint = {'center_x': 0.5, 'center_y': 0.90}
 
+            self.player_labels[2].opacity = 0
+            self.score_labels[2].opacity = 0
+            self.player_labels[3].opacity = 0
+            self.score_labels[3].opacity = 0
+
         elif self.num_player_count == 3:
             print("Permainan sudah dimulai dengan 3 Players!")
             # Player 1 at the bottom, Player 2 on the left, Player 3 on the right
@@ -464,7 +472,7 @@ class GameScreen(BaseScreen):
 
             self.player_labels[2].pos_hint = {'center_x': 0.95, 'center_y': 0.5}  # Right center
             self.score_labels[2].pos_hint = {'center_x': 0.95, 'center_y': 0.45}
-
+            
         elif self.num_player_count == 4:
             print("Permainan sudah dimulai dengan 4 Players!")
             # Player 1 at the bottom, Player 2 on the left, Player 3 on the top, Player 4 on the right
@@ -479,7 +487,6 @@ class GameScreen(BaseScreen):
 
             self.player_labels[3].pos_hint = {'center_x': 0.95, 'center_y': 0.5}  # Right center
             self.score_labels[3].pos_hint = {'center_x': 0.95, 'center_y': 0.45}
-
 
     def on_item_click(self, selected_item, player_id):
         self.handle_item_selection(selected_item, player_id)
