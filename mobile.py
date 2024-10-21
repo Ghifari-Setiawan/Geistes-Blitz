@@ -1,4 +1,3 @@
-# Import statements (keep at the top)
 from random import randint
 from kivy.app import App
 from kivy.uix.button import Button
@@ -477,8 +476,8 @@ class GameScreen(BaseScreen):
             self.player_labels[2].pos_hint = {'center_x': 0.5, 'center_y': 0.95}  # Top center
             self.score_labels[2].pos_hint = {'center_x': 0.5, 'center_y': 0.90}
 
-            self.player_labels[3].pos_hint = {'center_x': 0.95, 'center_y': 0.5}  # Right center
-            self.score_labels[3].pos_hint = {'center_x': 0.95, 'center_y': 0.45}
+            self.player_labels[3].pos_hint = {'center_x': 0.95, 'center_y': 0.6}  # Right center
+            self.score_labels[3].pos_hint = {'center_x': 0.95, 'center_y': 0.55}
 
 
     def on_item_click(self, selected_item, player_id):
