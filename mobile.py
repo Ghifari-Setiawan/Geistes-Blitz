@@ -83,10 +83,10 @@ class MainMenu(BaseScreen):
         # Create a layout for the popup
         popup_layout = FloatLayout()
 
-        Logger.info("Loading video from: {}".format('./assets/pkl record 1.mp4'))
+        Logger.info("Loading video from: {}".format('./assets/pkl_record.mp4'))
         
        # Create the video widget and add it to the layout
-        video = VideoPlayer(source='./assets/pkl record 1.mp4',
+        video = VideoPlayer(source='./assets/pkl_record.mp4',
                         size_hint=(0.9, 0.7), 
                         pos_hint={'center_x': 0.5, 'center_y': 0.6})
 
