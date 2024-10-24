@@ -16,7 +16,7 @@ from kivy.animation import Animation
 from kivy.uix.widget import Widget
 from kivy.uix.boxlayout import BoxLayout
 import random
-
+from kivy.clock import Clock
 
 # Set window size at the start
 Window.size = (1280, 720)
