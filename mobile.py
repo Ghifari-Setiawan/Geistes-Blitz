@@ -213,32 +213,13 @@ def animate_card_flip(self):
         self.on_player_win(self.player_turn)
 
 
-class Confetti(Widget):
-    def __init__(self, **kwargs):
-        super(Confetti, self).__init__(**kwargs)
-        self.image = Image(source="assets/confetti.png", size_hint=(None, None), size=(30, 30))
-        self.add_widget(self.image)
-        self.image.pos = (randint(0, Window.width), Window.height)  # Mulai dari atas
-
-    def animate(self):
-        # Animasikan confetti jatuh ke bawah
-        end_pos = (self.image.x, 0)
-        anim = Animation(pos=end_pos, duration=3, t='out_bounce')  # Durasi lebih panjang agar terlihat
-        anim.bind(on_complete=self.remove_confetti)
-        anim.start(self.image)
-
-    def remove_confetti(self, *args):
-        # Menghapus confetti setelah sampai di bawah
-        self.parent.remove_widget(self)
-
-
 class GameOverScreen(Screen):
     def __init__(self, **kwargs):
         super(GameOverScreen, self).__init__(**kwargs)
         self.layout = FloatLayout()  # Gunakan FloatLayout agar widget bisa bergerak
         self.add_widget(self.layout)
 
-    def on_enter(self):
+    def on_pre_enter(self):
         print("Game Over Screen entered")  # Memastikan layar Game Over muncul
         self.trigger_confetti_animation()  # Memicu animasi confetti saat layar Game Over muncul
 
@@ -247,6 +228,28 @@ class GameOverScreen(Screen):
             confetti = Confetti()
             self.layout.add_widget(confetti)
             confetti.animate()
+
+
+class Confetti(Widget):
+    def __init__(self, **kwargs):
+        super(Confetti, self).__init__(**kwargs)
+        self.image = Image(source="assets/confetti_new.png", size_hint=(None, None), size=(30, 30))
+        self.add_widget(self.image)
+        # Mulai dari posisi acak di bagian atas layar
+        self.image.pos = (Window.width // 2, Window.height - 50)
+
+
+    def animate(self):
+        # Animasikan confetti jatuh ke bawah
+        end_pos = (self.image.x, 9)
+        anim = Animation(pos=end_pos, duration=3, t='out_bounce')  # Durasi lebih panjang agar terlihat
+        anim.bind(on_complete=self.remove_confetti)
+        anim.start(self.image)
+
+    def remove_confetti(self, *args):
+        # Menghapus confetti setelah sampai di bawah
+        if self.parent:
+            self.parent.remove_widget(self)
 
 
 class GameApp(App):
