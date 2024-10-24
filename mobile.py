@@ -392,36 +392,51 @@ class GameScreen(BaseScreen):
         return positions[player_index]
         
     def add_selection_buttons(self):
-        """Creates item selection buttons for each player."""
-        positions = [
-                    {'center_x': 0.53, 'y': 0.10},         # Player 1 (top)
-                    {'center_x': 0.25, 'center_y': 0.65},  # Player 2 (left)
-                    {'center_x': 0.53, 'center_y': 0.80},  # Player 3 (buttom)
-                    {'center_x': 1.00, 'center_y': 0.65}]  # Player 4 (right)
+        """Adds selection buttons for each player based on the number of players."""
+        
+        # Define the positions based on the number of players
+        positions = []  # Initialize positions
+        if self.num_players == 2:
+            positions = [
+                {'center_x': 0.5, 'center_y': 0.130},  # Player 1 (bottom)
+                {'center_x': 0.5, 'center_y': 0.95}    # Player 2 (top)
+            ]
+        elif self.num_players == 3:
+            positions = [
+                {'center_x': 0.5, 'center_y': 0.130},  # Player 1 (bottom)
+                {'center_x': 0.050, 'center_y': 0.5},  # Player 2 (left)
+                {'center_x': 0.95, 'center_y': 0.5}    # Player 3 (right)
+            ]
+        elif self.num_players == 4:
+            positions = [
+                {'center_x': 0.5, 'center_y': 0.130},  # Player 1 (bottom)
+                {'center_x': 0.050, 'center_y': 0.5},  # Player 2 (left)
+                {'center_x': 0.5, 'center_y': 0.95},   # Player 3 (top)
+                {'center_x': 0.95, 'center_y': 0.6}    # Player 4 (right)
+            ]
+        else:
+            print(f"Warning: Unsupported number of players ({self.num_players}).")
+            return
 
-        items = self.create_items()  # Get the list of items with 'name' and 'image'
-
-        # Filter the positions based on the number of players
-        if self.num_player_count == 2:
-            # Show top (Player 1) and bottom (Player 3) positions for 2 players
-            positions = [positions[0], positions[2]]
-        elif self.num_player_count == 3:
-            # Show top, left, and bottom positions for 3 players
-            positions = [positions[0], positions[1], positions[2]]
+        # Get the list of items with 'name' and 'image'
+        items = self.create_items()
 
         # For each player, create item buttons at their respective position
-        for i in range(self.num_player_count):
-            # Adjust item button layout based on player index
+        for i in range(self.num_players):
+            # Create a GridLayout for the player's item buttons
             button_layout = GridLayout(cols=5 if i % 2 == 0 else 1, size_hint=(None, None), width=400, height=100)
 
             # Add buttons for each item available to the player
             for item in items:
-                # Create buttons/items for each player, with on_press sending the item and player_id
-                item_button = Button(background_normal=item['image'], size_hint=(None, None), size=(70, 60),
-                                    on_press=lambda btn, item=item, player_id=self.num_players[i]['id']: self.on_item_click(item, player_id))
-                button_layout.add_widget(item_button)  # Add the item_button to the button_layout
+                item_button = Button(
+                    background_normal=item['image'],
+                    size_hint=(None, None),
+                    size=(70, 60),
+                    on_press=lambda btn, item=item, player_id=i: self.on_item_click(item, player_id)
+                )
+                button_layout.add_widget(item_button)
 
-            # Set the position for the button layout according to the player's position
+            # Set the position for the button layout based on the player's index
             button_layout.pos_hint = positions[i]
 
             # Add the button layout to the main layout
@@ -460,7 +475,7 @@ class GameScreen(BaseScreen):
             self.player_labels[3].opacity = 0
             self.score_labels[3].opacity = 0
 
-        elif self.num_player_count == 3:
+        elif self.num_players == 3:
             print("Permainan sudah dimulai dengan 3 Players!")
             # Player 1 at the bottom, Player 2 on the left, Player 3 on the right
             self.player_labels[0].pos_hint = {'center_x': 0.5, 'center_y': 0.130}  # Bottom center
@@ -471,8 +486,11 @@ class GameScreen(BaseScreen):
 
             self.player_labels[2].pos_hint = {'center_x': 0.95, 'center_y': 0.5}  # Right center
             self.score_labels[2].pos_hint = {'center_x': 0.95, 'center_y': 0.45}
+
+            self.player_labels[3].opacity = 0
+            self.score_labels[3].opacity = 0
             
-        elif self.num_player_count == 4:
+        elif self.num_players == 4:
             print("Permainan sudah dimulai dengan 4 Players!")
             # Player 1 at the bottom, Player 2 on the left, Player 3 on the top, Player 4 on the right
             self.player_labels[0].pos_hint = {'center_x': 0.5, 'center_y': 0.130}  # Bottom center
