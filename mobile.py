@@ -175,42 +175,55 @@ class PlayerSelection(BaseScreen):
         self.add_widget(layout)
 
     def start_game(self, num_players):
+        """Starts the game with the specified number of players."""
+        # Set the number of players
+        self.num_player_count = num_players
+
+        # Get the GameScreen and reset the game state
         game_screen = self.manager.get_screen('game_screen')
-        game_screen.num_players = num_players
-        game_screen.update_player_labels_and_scores()
+        game_screen.num_player_count = num_players
+        game_screen.reset_game()
+
+        # Clear the existing layout if necessary
+        if hasattr(game_screen, 'layout') and game_screen.layout:
+            game_screen.layout.clear_widgets()
+
+        # Create the game layout
+        game_screen.create_game_layout()
+
+        # Add selection buttons based on the chosen number of players
+        game_screen.add_selection_buttons()
+
+        # Switch to the game screen
         self.manager.current = 'game_screen'
+
+        # Debug message
+        print(f"Game started with {num_players} players.")
 
     def go_back(self, instance):
         self.manager.current = 'main_menu'
 
+    def animate_card_flip(self):
+        """Animates the card with rotation and floating effects, plays sound."""
+        if self.current_card_index >= len(self.cards):
+            return
 
-    def start_game(self, num_players):
-        game_screen = self.manager.get_screen('game_screen')
-        game_screen.num_players = num_players
-        game_screen.update_player_labels_and_scores()
-        self.manager.current = 'game_screen'
+        self.card_image.source = self.cards[self.current_card_index]
 
-def animate_card_flip(self):
-    """Animates the card with rotation and floating effects, plays sound."""
-    if self.current_card_index >= len(self.cards):
-        return
+        # Create a more complex animation: rotation + scaling
+        anim = Animation(scale=0, duration=0.2) + Animation(scale=1, duration=0.2) + Animation(rotation=360, duration=0.5)
+        anim.start(self.card_image)
 
-    self.card_image.source = self.cards[self.current_card_index]
+        if self.card_flip_sound:
+            self.card_flip_sound.play()
 
-    # Create a more complex animation: rotation + scaling
-    anim = Animation(scale=0, duration=0.2) + Animation(scale=1, duration=0.2) + Animation(rotation=360, duration=0.5)
-    anim.start(self.card_image)
+        # Update card index
+        self.current_card_index += 1
+        self.update_card_indicator()
 
-    if self.card_flip_sound:
-        self.card_flip_sound.play()
-
-    # Update card index
-    self.current_card_index += 1
-    self.update_card_indicator()
-
-    # Check if it's the last card, and trigger a win if needed
-    if self.current_card_index >= len(self.cards):
-        self.on_player_win(self.player_turn)
+        # Check if it's the last card, and trigger a win if needed
+        if self.current_card_index >= len(self.cards):
+            self.on_player_win(self.player_turn)
 
 
 class GameOverScreen(Screen):
@@ -328,9 +341,6 @@ class GameScreen(BaseScreen):
                                     font_size=24, pos_hint={'center_x': 0.5, 'center_y': 0.7})
         self.layout.add_widget(self.cards_left_label)
 
-        # Add selection buttons
-        self.add_selection_buttons()
-
         # Add an exit button below the center card
         exit_button = ImageButton(source='assets/exit_icon_button.png', size_hint=(None, None), size=(64, 64), pos_hint={'center_x': 0.5, 'center_y': 0.30})
         exit_button.bind(on_press=self.show_exit_popup)
@@ -399,35 +409,38 @@ class GameScreen(BaseScreen):
         
         # Define the positions based on the number of players
         positions = []  # Initialize positions
-        if self.num_players == 2:
+        if self.num_player_count == 2:
+            print("Buttons 2 Players")
             positions = [
-                {'center_x': 0.5, 'center_y': 0.130},  # Player 1 (bottom)
-                {'center_x': 0.5, 'center_y': 0.95}    # Player 2 (top)
+                {'center_x': 0.5, 'center_y': 0.15},  # Player 1 (bottom)
+                {'center_x': 0.5, 'center_y': 0.85}   # Player 2 (top)
             ]
-        elif self.num_players == 3:
+        elif self.num_player_count == 3:
+            print("Buttons 3 Players")
             positions = [
-                {'center_x': 0.5, 'center_y': 0.130},  # Player 1 (bottom)
-                {'center_x': 0.050, 'center_y': 0.5},  # Player 2 (left)
-                {'center_x': 0.95, 'center_y': 0.5}    # Player 3 (right)
+                {'center_x': 0.5, 'center_y': 0.15},  # Player 1 (bottom)
+                {'center_x': 0.1, 'center_y': 0.5},   # Player 2 (left)
+                {'center_x': 0.9, 'center_y': 0.5}    # Player 3 (right)
             ]
-        elif self.num_players == 4:
+        elif self.num_player_count == 4:
+            print("Buttons 4 Players")
             positions = [
-                {'center_x': 0.5, 'center_y': 0.130},  # Player 1 (bottom)
-                {'center_x': 0.050, 'center_y': 0.5},  # Player 2 (left)
-                {'center_x': 0.5, 'center_y': 0.95},   # Player 3 (top)
-                {'center_x': 0.95, 'center_y': 0.6}    # Player 4 (right)
+                {'center_x': 0.5, 'center_y': 0.15},  # Player 1 (bottom)
+                {'center_x': 0.2, 'center_y': 0.5},   # Player 2 (left)
+                {'center_x': 0.5, 'center_y': 0.85},  # Player 3 (top)
+                {'center_x': 1.00, 'center_y': 0.5}    # Player 4 (right)
             ]
         else:
-            print(f"Warning: Unsupported number of players ({self.num_players}).")
+            print(f"Warning: Unsupported number of players ({self.num_player_count}).")
             return
 
         # Get the list of items with 'name' and 'image'
         items = self.create_items()
 
         # For each player, create item buttons at their respective position
-        for i in range(self.num_players):
+        for i in range(self.num_player_count):
             # Create a GridLayout for the player's item buttons
-            button_layout = GridLayout(cols=5 if i % 2 == 0 else 1, size_hint=(None, None), width=400, height=100)
+            button_layout = GridLayout(cols=5 if i % 2 == 0 else 1, size_hint=(None, None), width=450, height=100)
 
             # Add buttons for each item available to the player
             for item in items:
@@ -448,14 +461,15 @@ class GameScreen(BaseScreen):
 
     def update_player_labels_and_scores(self):
         """Updates the player labels and scores."""
-        for i in range(self.num_player_count):  # Use len(self.num_players)
+        # Ensure we only update labels for the number of existing players
+        for i in range(self.num_player_count):  # Use self.num_player_count
             self.player_labels[i].text = f"Player {i+1}"
             self.player_labels[i].opacity = 1  # Make it visible
             self.score_labels[i].text = f"Score: {self.scores[i]}"
             self.score_labels[i].opacity = 1
 
         # Hide labels for non-existent players (if any)
-        for i in range(self.num_player_count, 4):  # Handles up to 4 players
+        for i in range(self.num_player_count, len(self.player_labels)):  # Adjusted line
             self.player_labels[i].opacity = 0
             self.score_labels[i].opacity = 0
 
