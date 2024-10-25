@@ -440,8 +440,15 @@ class GameScreen(BaseScreen):
         # For each player, create item buttons at their respective position
         for i in range(self.num_player_count):
             # Create a GridLayout for the player's item buttons
-            button_layout = GridLayout(cols=5 if i % 2 == 0 else 1, size_hint=(None, None), width=450, height=100)
-
+            if self.num_player_count == 2:
+                button_layout = GridLayout(cols=5, size_hint=(None, None), width=450, height=100)
+                
+            elif self.num_player_count == 3: 
+                button_layout = GridLayout(cols=5 if i % 2 == 0 else 1, size_hint=(None, None), width=450, height=100)
+                
+            elif self.num_player_count == 4:
+                button_layout = GridLayout(cols=5 if i % 2 == 0 else 1, size_hint=(None, None), width=450, height=100)
+                
             # Add buttons for each item available to the player
             for item in items:
                 item_button = Button(
@@ -478,7 +485,7 @@ class GameScreen(BaseScreen):
     def update_player_positions(self):
         """Repositions players dynamically based on the number of players and screen layout."""
 
-        if self.num_players == 2:
+        if self.num_player_count == 2:
             print("Permainan sudah dimulai dengan 2 Players!")
             # Player 1 at the bottom, Player 2 at the top
             self.player_labels[0].pos_hint = {'center_x': 0.5, 'center_y': 0.130}  # Centered near the bottom
@@ -487,12 +494,7 @@ class GameScreen(BaseScreen):
             self.player_labels[1].pos_hint = {'center_x': 0.5, 'center_y': 0.95}  # Centered near the top
             self.score_labels[1].pos_hint = {'center_x': 0.5, 'center_y': 0.90}
 
-            self.player_labels[2].opacity = 0
-            self.score_labels[2].opacity = 0
-            self.player_labels[3].opacity = 0
-            self.score_labels[3].opacity = 0
-
-        elif self.num_players == 3:
+        elif self.num_player_count == 3:
             print("Permainan sudah dimulai dengan 3 Players!")
             # Player 1 at the bottom, Player 2 on the left, Player 3 on the right
             self.player_labels[0].pos_hint = {'center_x': 0.5, 'center_y': 0.130}  # Bottom center
@@ -503,15 +505,12 @@ class GameScreen(BaseScreen):
 
             self.player_labels[2].pos_hint = {'center_x': 0.95, 'center_y': 0.5}  # Right center
             self.score_labels[2].pos_hint = {'center_x': 0.95, 'center_y': 0.45}
-
-            self.player_labels[3].opacity = 0
-            self.score_labels[3].opacity = 0
             
-        elif self.num_players == 4:
+        elif self.num_player_count == 4:
             print("Permainan sudah dimulai dengan 4 Players!")
             # Player 1 at the bottom, Player 2 on the left, Player 3 on the top, Player 4 on the right
-            self.player_labels[0].pos_hint = {'center_x': 0.10, 'center_y': 1.150}  # Bottom center
-            self.score_labels[0].pos_hint = {'center_x': 0.10, 'center_y': 1.}
+            self.player_labels[0].pos_hint = {'center_x': 0.5, 'center_y': 0.130}  # Bottom center
+            self.score_labels[0].pos_hint = {'center_x': 0.5, 'center_y': 0.090}
 
             self.player_labels[1].pos_hint = {'center_x': 0.050, 'center_y': 0.5}  # Left center
             self.score_labels[1].pos_hint = {'center_x': 0.050, 'center_y': 0.45}
