@@ -394,14 +394,14 @@ class GameScreen(BaseScreen):
 
     def get_player_position(self, player_index):
         """Calculate player label positions."""
-        positions = [{'center_x': 0.5, 'top': 0.9}, {'center_x': 0.1, 'center_y': 0.5}, 
-                    {'center_x': 0.5, 'y': 0.1}, {'center_x': 0.9, 'center_y': 0.5}]
+        positions = [{'center_x': 0.5, 'top': 0.59}, {'center_x': 0.1, 'center_y': 0.5}, 
+                    {'center_x': 0.5, 'y': 0.47}, {'center_x': 0.9, 'center_y': 0.5}]
         return positions[player_index]
 
     def get_player_score_position(self, player_index):
         """Calculate score label positions."""
-        positions = [{'center_x': 0.5, 'top': 0.85}, {'center_x': 0.1, 'center_y': 0.45}, 
-                    {'center_x': 0.5, 'y': 0.15}, {'center_x': 0.9, 'center_y': 0.45}]
+        positions = [{'center_x': 0.5, 'top': 0.55}, {'center_x': 0.1, 'center_y': 0.45}, 
+                    {'center_x': 0.5, 'y': 0.43}, {'center_x': 0.9, 'center_y': 0.45}]
         return positions[player_index]
         
     def add_selection_buttons(self):
@@ -425,10 +425,10 @@ class GameScreen(BaseScreen):
         elif self.num_player_count == 4:
             print("Buttons 4 Players")
             positions = [
-                {'center_x': 0.5, 'center_y': 0.15},  # Player 1 (bottom)
-                {'center_x': 0.2, 'center_y': 0.5},   # Player 2 (left)
-                {'center_x': 0.5, 'center_y': 0.85},  # Player 3 (top)
-                {'center_x': 1.00, 'center_y': 0.5}    # Player 4 (right)
+                {'center_x': 0.54, 'center_y': 0.15},  # Player 1 (bottom)
+                {'center_x': 0.3, 'center_y': 0.6},   # Player 2 (left)
+                {'center_x': 0.54, 'center_y': 0.85},  # Player 3 (top)
+                {'center_x': 0.96 ,'center_y': 0.6}    # Player 4 (right)
             ]
         else:
             print(f"Warning: Unsupported number of players ({self.num_player_count}).")
@@ -510,8 +510,8 @@ class GameScreen(BaseScreen):
         elif self.num_players == 4:
             print("Permainan sudah dimulai dengan 4 Players!")
             # Player 1 at the bottom, Player 2 on the left, Player 3 on the top, Player 4 on the right
-            self.player_labels[0].pos_hint = {'center_x': 0.5, 'center_y': 0.130}  # Bottom center
-            self.score_labels[0].pos_hint = {'center_x': 0.5, 'center_y': 0.090}
+            self.player_labels[0].pos_hint = {'center_x': 0.10, 'center_y': 1.150}  # Bottom center
+            self.score_labels[0].pos_hint = {'center_x': 0.10, 'center_y': 1.}
 
             self.player_labels[1].pos_hint = {'center_x': 0.050, 'center_y': 0.5}  # Left center
             self.score_labels[1].pos_hint = {'center_x': 0.050, 'center_y': 0.45}
