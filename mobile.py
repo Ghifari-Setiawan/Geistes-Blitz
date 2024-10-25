@@ -444,7 +444,7 @@ class GameScreen(BaseScreen):
                 button_layout = GridLayout(cols=5, size_hint=(None, None), width=450, height=100)
                 
             elif self.num_player_count == 3: 
-                button_layout = GridLayout(cols=5 if i % 2 == 0 else 1, size_hint=(None, None), width=450, height=100)
+                button_layout = GridLayout(cols=5 if i % 3 == 0 else 1, size_hint=(None, None), width=450, height=100)
                 
             elif self.num_player_count == 4:
                 button_layout = GridLayout(cols=5 if i % 2 == 0 else 1, size_hint=(None, None), width=450, height=100)
