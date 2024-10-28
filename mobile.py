@@ -394,8 +394,8 @@ class GameScreen(BaseScreen):
 
     def get_player_position(self, player_index):
         """Calculate player label positions."""
-        positions = [{'center_x': 0.5, 'top': 0.59}, {'center_x': 0.1, 'center_y': 0.5}, 
-                    {'center_x': 0.5, 'y': 0.47}, {'center_x': 0.9, 'center_y': 0.5}]
+        positions = [{'center_x': 0.5, 'top': 0.90}, {'center_x': 0.1, 'center_y': 0.5}, 
+                    {'center_x': 0.5, 'y': 0.49}, {'center_x': 0.9, 'center_y': 0.5}]
         return positions[player_index]
 
     def get_player_score_position(self, player_index):
@@ -412,23 +412,23 @@ class GameScreen(BaseScreen):
         if self.num_player_count == 2:
             print("Buttons 2 Players")
             positions = [
-                {'center_x': 0.5, 'center_y': 0.15},  # Player 1 (bottom)
-                {'center_x': 0.5, 'center_y': 0.85}   # Player 2 (top)
+                {'center_x': 0.54, 'center_y': 0.15},  # Player 1 (bottom)
+                {'center_x': 0.54, 'center_y': 0.80}   # Player 2 (top)
             ]
         elif self.num_player_count == 3:
             print("Buttons 3 Players")
             positions = [
-                {'center_x': 0.5, 'center_y': 0.15},  # Player 1 (bottom)
-                {'center_x': 0.1, 'center_y': 0.5},   # Player 2 (left)
-                {'center_x': 0.9, 'center_y': 0.5}    # Player 3 (right)
+                {'center_x': 0.54, 'center_y': 0.15},  # Player 1 (bottom)
+                {'center_x': 0.28, 'center_y': 0.65},   # Player 2 (left)
+                {'center_x': 0.99, 'center_y': 0.65}    # Player 3 (right)
             ]
         elif self.num_player_count == 4:
             print("Buttons 4 Players")
             positions = [
                 {'center_x': 0.54, 'center_y': 0.15},  # Player 1 (bottom)
-                {'center_x': 0.3, 'center_y': 0.6},   # Player 2 (left)
-                {'center_x': 0.54, 'center_y': 0.85},  # Player 3 (top)
-                {'center_x': 0.96 ,'center_y': 0.6}    # Player 4 (right)
+                {'center_x': 0.3, 'center_y': 0.65},   # Player 2 (left)
+                {'center_x': 0.54, 'center_y': 0.80},  # Player 3 (top)
+                {'center_x': 0.96 ,'center_y': 0.65}    # Player 4 (right)
             ]
         else:
             print(f"Warning: Unsupported number of players ({self.num_player_count}).")
@@ -509,8 +509,8 @@ class GameScreen(BaseScreen):
         elif self.num_player_count == 4:
             print("Permainan sudah dimulai dengan 4 Players!")
             # Player 1 at the bottom, Player 2 on the left, Player 3 on the top, Player 4 on the right
-            self.player_labels[0].pos_hint = {'center_x': 0.5, 'center_y': 0.130}  # Bottom center
-            self.score_labels[0].pos_hint = {'center_x': 0.5, 'center_y': 0.090}
+            self.player_labels[0].pos_hint = {'center_x': 0.5, 'center_y': 0.20}  # Bottom center
+            self.score_labels[0].pos_hint = {'center_x': 0.5, 'center_y': 0.1}
 
             self.player_labels[1].pos_hint = {'center_x': 0.050, 'center_y': 0.5}  # Left center
             self.score_labels[1].pos_hint = {'center_x': 0.050, 'center_y': 0.45}
