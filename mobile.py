@@ -308,6 +308,7 @@ class GameScreen(BaseScreen):
         self.update_card()
 
     def create_game_layout(self):
+        """Sets up the main game layout, including items, cards, player labels, and buttons."""
         self.layout = FloatLayout()
 
         # Create items and cards
@@ -315,13 +316,12 @@ class GameScreen(BaseScreen):
         self.cards = self.create_cards()
         self.current_card = self.cards[0]
 
-        # Add player labels and scores dynamically based on num_players
+        # Add player labels and scores dynamically based on the number of players
         self.player_labels = []
         self.score_labels = []
 
-
-        # Iterate using the length of the list
-        for i in range(self.num_player_count):  # Corrected line
+        # Iterate using the number of players
+        for i in range(self.num_player_count):
             player_label = Label(text=f"Player {i+1}", font_size=24, pos_hint=self.get_player_position(i))
             score_label = Label(text=f"{self.scores[i]} pts", font_size=18, pos_hint=self.get_player_score_position(i))
 
@@ -332,35 +332,50 @@ class GameScreen(BaseScreen):
 
         self.update_player_labels_and_scores()  # Position the player labels and scores
 
+        # Add the permanent back card button on the left for flipping
+        self.back_card_button = self.add_back_card_button(pos_hint={'center_x': 0.4, 'center_y': 0.5})
 
-        # Add first card at the center
-        self.card_image_1 = self.add_card_at_position(self.cards[self.current_card_index], pos_hint={'center_x': 0.4, 'center_y': 0.50})
+        # Add the second card on the right (hidden initially)
+        self.card_image_2 = self.add_card_at_position(None, pos_hint={'center_x': 0.6, 'center_y': 0.5})
 
-        # Add card indicator label (optional for showing remaining cards)
+        # Update to the first card
+        self.update_next_card()
+
+        # Add card indicator label for showing the remaining number of cards
         self.cards_left_label = Label(text=f"Cards Left: {len(self.cards) - self.current_card_index}",
                                     font_size=24, pos_hint={'center_x': 0.5, 'center_y': 0.7})
         self.layout.add_widget(self.cards_left_label)
 
         # Add an exit button below the center card
-        exit_button = ImageButton(source='assets/exit_icon_button.png', size_hint=(None, None), size=(64, 64), pos_hint={'center_x': 0.5, 'center_y': 0.30})
+        exit_button = ImageButton(source='assets/exit_icon_button.png', size_hint=(None, None), size=(64, 64), 
+                                pos_hint={'center_x': 0.5, 'center_y': 0.30})
         exit_button.bind(on_press=self.show_exit_popup)
         self.layout.add_widget(exit_button)
 
+        # Add the layout to the screen
         self.add_widget(self.layout)
 
+
+    def add_back_card_button(self, pos_hint):
+        """Adds a permanent back card button on the left for flipping to the next card."""
+        back_card_button = ImageButton(source='assets/back_card.jpg', size_hint=(0.30, 0.30), pos_hint=pos_hint)
+        back_card_button.bind(on_press=self.flip_to_next_card)
+        self.layout.add_widget(back_card_button)
+        return back_card_button
+
     def add_card_at_position(self, card, pos_hint):
-        """Menambahkan kartu ke layar pada posisi tertentu."""
+        """Adds a card to the screen at a specified position."""
+        # Initially set the card image to back_card.jpg
         card_image = ImageButton(source='assets/back_card.jpg', size_hint=(0.30, 0.30), pos_hint=pos_hint)
-        card_image.bind(on_press=self.card_clicked)
         self.layout.add_widget(card_image)
         return card_image
 
-    def card_clicked(self, instance):
-        """Method yang dipanggil saat kartu diklik."""
-        print("Kartu diklik!")
+    def card_clicked(self, instance, card):
+        """Method called when the card is clicked, triggering a flip animation."""
+        print("Card clicked!")
 
-        # Panggil animasi flip kartu (optional)
-        self.animate_card_flip()
+        # Trigger the card flip animation
+        self.animate_card_flip(instance, card)
         self.update_next_card()
 
     def update_next_card(self):
@@ -372,25 +387,53 @@ class GameScreen(BaseScreen):
             # Update the current card object
             self.current_card = self.cards[self.current_card_index]
             
-            # Check if a second card should be visible and update its image
+            # Check if the second card is visible (right side back card)
             if not self.is_second_card_visible:
-                self.card_image_2 = self.add_card_at_position(self.cards[self.current_card_index], pos_hint={'center_x': 0.6, 'center_y': 0.50})
+                # Show the actual card on the right and hide the back card
+                self.card_image_2.source = self.current_card['image']
                 self.is_second_card_visible = True
             else:
-                # Change the second card image if it's already visible
-                self.card_image_2.source = self.current_card['image']
-
-            # Update the card indicator label
-            self.cards_left_label.text = f"Cards Left: {len(self.cards) - self.current_card_index}"
-
+                # Make the right back card disappear after the first card flip
+                self.card_image_2.opacity = 1  # Make it invisible
+        
         else:
-            print("All cards have been used.")
+            print("No more cards left to flip.")
             self.display_scores()
 
+    def flip_to_next_card(self, instance):
+        """Flip the right card to reveal the next card in the sequence."""
+        if self.current_card_index < len(self.cards):
+            # Update to the next card in the sequence
+            self.current_card = self.cards[self.current_card_index]
+            self.current_card['used'] = True
+            self.animate_card_flip(self.card_image_2, self.current_card)
+            
+            # Move to the next card index
+            self.current_card_index += 1
+            self.update_card_indicator()  # Update the card count indicator
 
-    def animate_card_flip(self):
-        """Animasi flip kartu (dummy, bisa ditambahkan animasi sebenarnya)."""
-        print("Animasi flip kartu berjalan...")
+        else:
+            print("No more cards left to flip.")
+            self.display_scores()
+
+    def animate_card_flip(self, card_image, card):
+        """Animates the card flipping and updates the image to the card's front."""
+        # Animation for shrinking width to 0 (start of the flip)
+        flip_to_mid = Animation(size_hint_x=0, duration=0.2)
+        
+        # Animation for expanding width back to original size (end of the flip)
+        flip_to_full = Animation(size_hint_x=0.30, duration=0.2)
+        
+        # After reaching the mid-flip, change the image to the card's front
+        def reveal_front(*args):
+            card_image.source = card['image']  # Change to the actual card image
+        
+        # Bind the reveal function to the midpoint of the flip animation
+        flip_to_mid.bind(on_complete=reveal_front)
+
+        # Chain the animations: flip to mid, then flip to full
+        flip_to_mid.start(card_image)
+        flip_to_mid.bind(on_complete=lambda *args: flip_to_full.start(card_image))
 
     def get_player_position(self, player_index):
         """Calculate player label positions."""
@@ -536,7 +579,7 @@ class GameScreen(BaseScreen):
 
     def create_cards(self):
         """Defines the cards, including correct and incorrect items."""
-        return [
+        cards = [
             {'image': 'assets/level1/card1.jpg', 'correct_item': 'Sofa', 'incorrect_item': None, 'level': 1, 'used': False},
             {'image': 'assets/level1/card2.jpg', 'correct_item': 'Ghost', 'incorrect_item': None, 'level': 1, 'used': False},
             {'image': 'assets/level1/card3.jpg', 'correct_item': 'Sofa', 'incorrect_item': None, 'level': 1, 'used': False},
@@ -558,6 +601,10 @@ class GameScreen(BaseScreen):
             {'image': 'assets/level2/card19.jpg', 'correct_item': None, 'incorrect_item': 'Mouse', 'level': 2, 'used': False},
             {'image': 'assets/level2/card20.jpg', 'correct_item': None, 'incorrect_item': 'Bottle', 'level': 2, 'used': False},
         ]
+
+        # Shuffle the cards to ensure random order
+        random.shuffle(cards)
+        return cards
 
     def handle_item_selection(self, selected_item, player_id):
         # Check if the selected item is correct based on the card's level
