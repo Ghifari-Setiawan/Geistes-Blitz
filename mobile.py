@@ -284,75 +284,64 @@ class GameScreen(BaseScreen):
     def __init__(self, **kwargs):
         super(GameScreen, self).__init__(**kwargs)
         self.num_players = [{'id': 0, 'name': 'Player 1'}, {'id': 1, 'name': 'Player 2'}, {'id': 2, 'name': 'Player 3'}, {'id': 3, 'name': 'Player 4'}]
-        self.num_player_count = len(self.num_players)  # Separate count
-        self.scores = [0] * self.num_player_count  # Initialize player scores
-        self.current_card_index = 0
+        self.num_player_count = len(self.num_players)
+        self.scores = [0] * self.num_player_count
+        self.current_card_index = -1
         self.player_turn = 0
         self.is_second_card_visible = False
         self.current_player_index = 0
-        self.cards = self.create_cards()  # Initialize the cards
-        self.create_game_layout()  # Create the game layout
-        self.reset_game()  # Initialize the game at the start
+        self.cards = self.create_cards()
+        self.create_game_layout()
+        self.reset_game()
 
     def reset_game(self):
-        """Resets the game state, including cards and scores."""
-        self.current_card_index = 0
+        self.current_card_index = -1
         self.player_turn = 0
-        self.scores = [0] * self.num_player_count  # Initialize player scores
-        self.cards = self.create_cards()  # Reset cards
+        self.scores = [0] * self.num_player_count
+        self.cards = self.create_cards()
         self.card_image_1 = None
-        self.card_image_2 = None
         self.is_second_card_visible = False
         self.current_player_index = 0
         self.update_player_labels_and_scores()
         self.update_card()
 
-    def create_game_layout(self):
-        """Sets up the main game layout, including items, cards, player labels, and buttons."""
-        self.layout = FloatLayout()
+        # Reset card_image_2 to back card when the game resets
+        if self.card_image_2:
+            self.card_image_2.source = 'assets/back_card.jpg'
 
-        # Create items and cards
+    def create_game_layout(self):
+        self.layout = FloatLayout()
         self.items = self.create_items()
         self.cards = self.create_cards()
         self.current_card = self.cards[0]
-
-        # Add player labels and scores dynamically based on the number of players
         self.player_labels = []
         self.score_labels = []
 
-        # Iterate using the number of players
         for i in range(self.num_player_count):
             player_label = Label(text=f"Player {i+1}", font_size=24, pos_hint=self.get_player_position(i))
             score_label = Label(text=f"{self.scores[i]} pts", font_size=18, pos_hint=self.get_player_score_position(i))
-
             self.player_labels.append(player_label)
             self.score_labels.append(score_label)
             self.layout.add_widget(player_label)
             self.layout.add_widget(score_label)
 
-        self.update_player_labels_and_scores()  # Position the player labels and scores
-
-        # Add the permanent back card button on the left for flipping
+        self.update_player_labels_and_scores()
         self.back_card_button = self.add_back_card_button(pos_hint={'center_x': 0.4, 'center_y': 0.5})
 
-        # Add the second card on the right (hidden initially)
         self.card_image_2 = self.add_card_at_position(None, pos_hint={'center_x': 0.6, 'center_y': 0.5})
+        self.card_image_2.source = 'assets/back_card.jpg'
 
-        # Update to the first card
         self.update_next_card()
 
-        # Add card indicator label for showing the remaining number of cards
         self.cards_left_label = Label(text=f"Cards Left: {len(self.cards) - self.current_card_index}",
-                                    font_size=24, pos_hint={'center_x': 0.5, 'center_y': 0.7})
+                                      font_size=24, pos_hint={'center_x': 0.5, 'center_y': 0.7})
         self.layout.add_widget(self.cards_left_label)
 
-        # Add an exit button below the center card
-        exit_button = ImageButton(source='assets/exit_icon_button.png', size_hint=(None, None), size=(64, 64), 
-                                pos_hint={'center_x': 0.5, 'center_y': 0.30})
+        exit_button = ImageButton(source='assets/exit_icon_button.png', size_hint=(None, None), size=(64, 64),
+                                  pos_hint={'center_x': 0.5, 'center_y': 0.30})
         exit_button.bind(on_press=self.show_exit_popup)
         self.layout.add_widget(exit_button)
 
-        # Add the layout to the screen
         self.add_widget(self.layout)
 
 
@@ -402,36 +391,43 @@ class GameScreen(BaseScreen):
 
     def flip_to_next_card(self, instance):
         """Flip the right card to reveal the next card in the sequence."""
-        if self.current_card_index < len(self.cards):
-            # Update to the next card in the sequence
-            self.current_card = self.cards[self.current_card_index]
-            self.current_card['used'] = True
-            self.animate_card_flip(self.card_image_2, self.current_card)
+        # Ensure there is a card to display
+        if self.current_card_index < len(self.cards) - 1:
+            # Get the next card in the list
+            new_card = self.cards[self.current_card_index + 1]
             
-            # Move to the next card index
+            # Call the animate_card_flip function with the correct arguments
+            self.animate_card_flip(self.card_image_2, self.current_card, new_card)
+            
+            # Update current_card and increment the card index
+            self.current_card = new_card
             self.current_card_index += 1
+
             self.update_card_indicator()  # Update the card count indicator
+            self.cards_left_label.text = f"Cards Left: {len(self.cards) - self.current_card_index - 1}"
 
         else:
             print("No more cards left to flip.")
             self.display_scores()
 
-    def animate_card_flip(self, card_image, card):
-        """Animates the card flipping and updates the image to the card's front."""
-        # Animation for shrinking width to 0 (start of the flip)
+    def animate_card_flip(self, card_image, current_card, new_card):
+        if self.current_card_index == -1:
+            # Set initial flip
+            self.current_card_index = 0
+            card_image.source = new_card['image']
+        else:
+            # Set new card image during subsequent flips
+            card_image.source = new_card['image'] if new_card else current_card['image']
+
+        # Animation logic remains the same
         flip_to_mid = Animation(size_hint_x=0, duration=0.2)
-        
-        # Animation for expanding width back to original size (end of the flip)
         flip_to_full = Animation(size_hint_x=0.30, duration=0.2)
         
         # After reaching the mid-flip, change the image to the card's front
         def reveal_front(*args):
-            card_image.source = card['image']  # Change to the actual card image
-        
-        # Bind the reveal function to the midpoint of the flip animation
-        flip_to_mid.bind(on_complete=reveal_front)
+            card_image.source = current_card['image'] if new_card is None else new_card['image']
 
-        # Chain the animations: flip to mid, then flip to full
+        flip_to_mid.bind(on_complete=reveal_front)
         flip_to_mid.start(card_image)
         flip_to_mid.bind(on_complete=lambda *args: flip_to_full.start(card_image))
 
@@ -449,38 +445,34 @@ class GameScreen(BaseScreen):
         
     def add_selection_buttons(self):
         """Adds selection buttons for each player based on the number of players."""
-        
+
         # Define the positions based on the number of players
-        positions = []  # Initialize positions
+        positions = []
         if self.num_player_count == 2:
-            print("Buttons 2 Players")
             positions = [
                 {'center_x': 0.54, 'center_y': 0.15},  # Player 1 (bottom)
                 {'center_x': 0.54, 'center_y': 0.80}   # Player 2 (top)
             ]
         elif self.num_player_count == 3:
-            print("Buttons 3 Players")
             positions = [
                 {'center_x': 0.54, 'center_y': 0.15},  # Player 1 (bottom)
-                {'center_x': 0.28, 'center_y': 0.65},   # Player 2 (left)
-                {'center_x': 0.99, 'center_y': 0.65}    # Player 3 (right)
+                {'center_x': 0.28, 'center_y': 0.65},  # Player 2 (left)
+                {'center_x': 0.99, 'center_y': 0.65}   # Player 3 (right)
             ]
         elif self.num_player_count == 4:
-            print("Buttons 4 Players")
             positions = [
                 {'center_x': 0.54, 'center_y': 0.15},  # Player 1 (bottom)
                 {'center_x': 0.3, 'center_y': 0.65},   # Player 2 (left)
                 {'center_x': 0.54, 'center_y': 0.80},  # Player 3 (top)
-                {'center_x': 0.96 ,'center_y': 0.65}    # Player 4 (right)
+                {'center_x': 0.96, 'center_y': 0.65}   # Player 4 (right)
             ]
         else:
             print(f"Warning: Unsupported number of players ({self.num_player_count}).")
             return
 
-        # Get the list of items with 'name' and 'image'
-        items = self.create_items()
+        items = self.create_items()  # Get the list of items
 
-        # For each player, create item buttons at their respective position
+        # Create buttons for each player
         for i in range(self.num_player_count):
             # Create a GridLayout for the player's item buttons
             if self.num_player_count == 2:
@@ -492,21 +484,19 @@ class GameScreen(BaseScreen):
             elif self.num_player_count == 4:
                 button_layout = GridLayout(cols=5 if i % 2 == 0 else 1, size_hint=(None, None), width=450, height=100)
                 
-            # Add buttons for each item available to the player
             for item in items:
                 item_button = Button(
-                    background_normal=item['image'],
+                    background_normal=item['image'],  # Ensure this path is correct
                     size_hint=(None, None),
-                    size=(70, 60),
+                    size=(80, 70),
                     on_press=lambda btn, item=item, player_id=i: self.on_item_click(item, player_id)
                 )
                 button_layout.add_widget(item_button)
 
-            # Set the position for the button layout based on the player's index
-            button_layout.pos_hint = positions[i]
 
-            # Add the button layout to the main layout
-            self.layout.add_widget(button_layout)
+            button_layout.pos_hint = positions[i]  # Position for each player's layout
+            self.layout.add_widget(button_layout)   # Add layout to the main layout
+
 
 
     def update_player_labels_and_scores(self):
@@ -621,22 +611,20 @@ class GameScreen(BaseScreen):
             else:
                 print(f"Player {player_id + 1} selected the wrong item!")
 
-        # Get the list of unused cards
-        unused_cards = [card for card in self.cards if not card['used']]
-
-        if unused_cards:
-            # Shuffle the unused cards
-            random.shuffle(unused_cards)
-            
-            # Pick the next card randomly from the shuffled list
-            self.current_card = unused_cards[0]  
-            self.current_card['used'] = True  # Mark the card as used
+        # Increase the index to fetch the next card if available
+        if self.current_card_index < len(self.cards) - 1:
+            self.current_card_index += 1
+            self.current_card = self.cards[self.current_card_index]
+            self.current_card['used'] = True  # Mark this card as used
+            # Trigger the card flip animation with the next card
+            self.animate_card_flip(self.card_image_2, self.current_card, self.current_card)
         else:
             print("No Cards Remaining!")
             self.display_scores()  # Display final scores when the game ends
             return
-        
-        self.update_next_card()
+
+        # Update the 'Cards Left' label
+        self.cards_left_label.text = f"Cards Left: {len(self.cards) - self.current_card_index - 1}"
         self.update_player_labels_and_scores()
 
 
