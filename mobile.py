@@ -318,8 +318,8 @@ class GameScreen(BaseScreen):
         self.score_labels = []
 
         for i in range(self.num_player_count):
-            player_label = Label(text=f"Player {i+1}", font_size=24, pos_hint=self.get_player_position(i))
-            score_label = Label(text=f"{self.scores[i]} pts", font_size=18, pos_hint=self.get_player_score_position(i))
+            player_label = Label(text=f"Player {i+1}", font_size=24, font_name='assets/fonts/CreteRound-Regular.ttf', pos_hint=self.get_player_position(i))
+            score_label = Label(text=f"{self.scores[i]} pts", font_size=18, font_name='assets/fonts/RocknRollOne-Regular.ttf', pos_hint=self.get_player_score_position(i))
             self.player_labels.append(player_label)
             self.score_labels.append(score_label)
             self.layout.add_widget(player_label)
@@ -334,7 +334,7 @@ class GameScreen(BaseScreen):
         self.update_next_card()
 
         self.cards_left_label = Label(text=f"Cards Left: {len(self.cards) - self.current_card_index}",
-                                      font_size=24, pos_hint={'center_x': 0.5, 'center_y': 0.7})
+                                      font_size=24, font_name='assets/fonts/CreteRound-Regular.ttf', pos_hint={'center_x': 0.5, 'center_y': 0.7})
         self.layout.add_widget(self.cards_left_label)
 
         exit_button = ImageButton(source='assets/exit_icon_button.png', size_hint=(None, None), size=(64, 64),
@@ -450,20 +450,20 @@ class GameScreen(BaseScreen):
         positions = []
         if self.num_player_count == 2:
             positions = [
-                {'center_x': 0.54, 'center_y': 0.15},  # Player 1 (bottom)
-                {'center_x': 0.54, 'center_y': 0.80}   # Player 2 (top)
+                {'center_x': 0.5, 'center_y': 0.17},  # Player 1 (bottom)
+                {'center_x': 0.5, 'center_y': 0.80}   # Player 2 (top)
             ]
         elif self.num_player_count == 3:
             positions = [
-                {'center_x': 0.54, 'center_y': 0.15},  # Player 1 (bottom)
+                {'center_x': 0.5, 'center_y': 0.17},  # Player 1 (bottom)
                 {'center_x': 0.28, 'center_y': 0.65},  # Player 2 (left)
                 {'center_x': 0.99, 'center_y': 0.65}   # Player 3 (right)
             ]
         elif self.num_player_count == 4:
             positions = [
-                {'center_x': 0.54, 'center_y': 0.15},  # Player 1 (bottom)
+                {'center_x': 0.5, 'center_y': 0.17},  # Player 1 (bottom)
                 {'center_x': 0.3, 'center_y': 0.65},   # Player 2 (left)
-                {'center_x': 0.54, 'center_y': 0.80},  # Player 3 (top)
+                {'center_x': 0.5, 'center_y': 0.80},  # Player 3 (top)
                 {'center_x': 0.96, 'center_y': 0.65}   # Player 4 (right)
             ]
         else:
@@ -474,15 +474,14 @@ class GameScreen(BaseScreen):
 
         # Create buttons for each player
         for i in range(self.num_player_count):
-            # Create a GridLayout for the player's item buttons
             if self.num_player_count == 2:
-                button_layout = GridLayout(cols=5, size_hint=(None, None), width=450, height=100)
+                button_layout = GridLayout(cols=5, size_hint=(None, None), width=450, height=100, spacing=30)
                 
             elif self.num_player_count == 3: 
-                button_layout = GridLayout(cols=5 if i % 3 == 0 else 1, size_hint=(None, None), width=450, height=100)
+                button_layout = GridLayout(cols=5 if i % 3 == 0 else 1, size_hint=(None, None), width=450, height=100, spacing=30)
                 
             elif self.num_player_count == 4:
-                button_layout = GridLayout(cols=5 if i % 2 == 0 else 1, size_hint=(None, None), width=450, height=100)
+                button_layout = GridLayout(cols=5 if i % 2 == 0 else 1, size_hint=(None, None), width=450, height=100,spacing=30)
                 
             for item in items:
                 item_button = Button(
@@ -521,8 +520,8 @@ class GameScreen(BaseScreen):
         if self.num_player_count == 2:
             print("Permainan sudah dimulai dengan 2 Players!")
             # Player 1 at the bottom, Player 2 at the top
-            self.player_labels[0].pos_hint = {'center_x': 0.5, 'center_y': 0.130}  # Centered near the bottom
-            self.score_labels[0].pos_hint = {'center_x': 0.5, 'center_y': 0.090}
+            self.player_labels[0].pos_hint = {'center_x': 0.5, 'center_y': 0.1}  # Centered near the bottom
+            self.score_labels[0].pos_hint = {'center_x': 0.5, 'center_y': 0.06}
 
             self.player_labels[1].pos_hint = {'center_x': 0.5, 'center_y': 0.95}  # Centered near the top
             self.score_labels[1].pos_hint = {'center_x': 0.5, 'center_y': 0.90}
@@ -530,8 +529,8 @@ class GameScreen(BaseScreen):
         elif self.num_player_count == 3:
             print("Permainan sudah dimulai dengan 3 Players!")
             # Player 1 at the bottom, Player 2 on the left, Player 3 on the right
-            self.player_labels[0].pos_hint = {'center_x': 0.5, 'center_y': 0.130}  # Bottom center
-            self.score_labels[0].pos_hint = {'center_x': 0.5, 'center_y': 0.090}
+            self.player_labels[0].pos_hint = {'center_x': 0.5, 'center_y': 0.1}  # Bottom center
+            self.score_labels[0].pos_hint = {'center_x': 0.5, 'center_y': 0.06}
 
             self.player_labels[1].pos_hint = {'center_x': 0.050, 'center_y': 0.5}  # Left center
             self.score_labels[1].pos_hint = {'center_x': 0.050, 'center_y': 0.45}
@@ -542,8 +541,8 @@ class GameScreen(BaseScreen):
         elif self.num_player_count == 4:
             print("Permainan sudah dimulai dengan 4 Players!")
             # Player 1 at the bottom, Player 2 on the left, Player 3 on the top, Player 4 on the right
-            self.player_labels[0].pos_hint = {'center_x': 0.5, 'center_y': 0.20}  # Bottom center
-            self.score_labels[0].pos_hint = {'center_x': 0.5, 'center_y': 0.1}
+            self.player_labels[0].pos_hint = {'center_x': 0.5, 'center_y': 0.1}  # Bottom center
+            self.score_labels[0].pos_hint = {'center_x': 0.5, 'center_y': 0.06}
 
             self.player_labels[1].pos_hint = {'center_x': 0.050, 'center_y': 0.5}  # Left center
             self.score_labels[1].pos_hint = {'center_x': 0.050, 'center_y': 0.45}
@@ -560,11 +559,11 @@ class GameScreen(BaseScreen):
     def create_items(self):
         """Defines the available items with images."""
         return [
-            {'name': 'Ghost', 'image': 'assets/setan.png'},
-            {'name': 'Book', 'image': 'assets/buku.png'},
-            {'name': 'Bottle', 'image': 'assets/botol.png'},
-            {'name': 'Mouse', 'image': 'assets/tikus.png'},
-            {'name': 'Sofa', 'image': 'assets/sofa.png'},
+            {'name': 'Ghost', 'image': 'assets/ghost2.jpg'},
+            {'name': 'Book', 'image': 'assets/buku2.jpg'},
+            {'name': 'Bottle', 'image': 'assets/botol2.jpg'},
+            {'name': 'Mouse', 'image': 'assets/tikus2.jpg'},
+            {'name': 'Sofa', 'image': 'assets/sofa2.jpg'},
         ]
 
     def create_cards(self):
