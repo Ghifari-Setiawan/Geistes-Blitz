@@ -19,7 +19,7 @@ import random
 from kivy.clock import Clock
 
 # Set window size at the start
-Window.size = (1280, 720)
+Window.size = (2340, 1080)
 
 # Classes for custom widgets like ImageButton
 class ImageButton(ButtonBehavior, Image):
@@ -182,21 +182,20 @@ class PlayerSelection(BaseScreen):
         # Get the GameScreen and reset the game state
         game_screen = self.manager.get_screen('game_screen')
         game_screen.num_player_count = num_players
+
+        # Reset and prepare the game layout for the new number of players
         game_screen.reset_game()
-
-        # Clear the existing layout if necessary
-        if hasattr(game_screen, 'layout') and game_screen.layout:
-            game_screen.layout.clear_widgets()
-
-        # Create the game layout
-        game_screen.create_game_layout()
 
         # Add selection buttons based on the chosen number of players
         game_screen.add_selection_buttons()
 
+        # Update player labels to match the player count if they exist
+        if len(game_screen.player_labels) == num_players:
+            game_screen.update_player_labels_and_scores()
+
         # Switch to the game screen
         self.manager.current = 'game_screen'
-
+        
         # Debug message
         print(f"Game started with {num_players} players.")
 
@@ -218,7 +217,7 @@ class PlayerSelection(BaseScreen):
             self.card_flip_sound.play()
 
         # Update card index
-        self.current_card_index += 1
+        self.current_card_index += 0
         self.update_card_indicator()
 
         # Check if it's the last card, and trigger a win if needed
@@ -293,23 +292,44 @@ class GameScreen(BaseScreen):
         self.cards = self.create_cards()
         self.create_game_layout()
         self.reset_game()
+        self.card_image_2.source = 'assets/back_card.jpg'
 
     def reset_game(self):
-        self.current_card_index = -1
+        """Resets the game state, including cards and scores."""
+        self.current_card_index = -1  # Start from the first card
         self.player_turn = 0
-        self.scores = [0] * self.num_player_count
-        self.cards = self.create_cards()
-        self.card_image_1 = None
+        self.scores = [0] * self.num_player_count  # Reset scores
+        self.cards = self.create_cards()  # Reset card deck with fresh cards
+        for card in self.cards:
+            card['used'] = False  # Mark all cards as unused
+        self.current_card = self.cards[self.current_card_index]  # Start with the first card
+        self.current_card['used'] = True
         self.is_second_card_visible = False
         self.current_player_index = 0
-        self.update_player_labels_and_scores()
-        self.update_card()
+        self.card_image_2.source = 'assets/back_card.jpg'
 
-        # Reset card_image_2 to back card when the game resets
-        if self.card_image_2:
-            self.card_image_2.source = 'assets/back_card.jpg'
+        # Reset player labels
+        self.player_labels = []
+        self.create_game_layout()  # Ensure the layout is rebuilt
+
+        # Re-add player selection buttons based on player count
+        self.add_selection_buttons()
+        
+        # Update labels if player_labels has been populated correctly
+        if len(self.player_labels) == self.num_player_count:
+            self.update_player_labels_and_scores()
+        
+        self.cards_left_label.text = f"Cards Left: {len(self.cards) - 1}"  # Update initial count
+        self.update_player_labels_and_scores()
 
     def create_game_layout(self):
+        # Check if the layout already exists and clear it if necessary
+        if hasattr(self, 'layout') and self.layout:
+            self.layout.clear_widgets()  # Remove existing widgets to prevent duplication
+        else:
+            # Initialize the main layout if it doesn't exist
+            self.layout = FloatLayout()
+
         self.layout = FloatLayout()
         self.items = self.create_items()
         self.cards = self.create_cards()
@@ -331,8 +351,6 @@ class GameScreen(BaseScreen):
         self.card_image_2 = self.add_card_at_position(None, pos_hint={'center_x': 0.6, 'center_y': 0.5})
         self.card_image_2.source = 'assets/back_card.jpg'
 
-        self.update_next_card()
-
         self.cards_left_label = Label(text=f"Cards Left: {len(self.cards) - self.current_card_index}",
                                       font_size=24, font_name='assets/fonts/CreteRound-Regular.ttf', pos_hint={'center_x': 0.5, 'center_y': 0.7})
         self.layout.add_widget(self.cards_left_label)
@@ -342,13 +360,12 @@ class GameScreen(BaseScreen):
         exit_button.bind(on_press=self.show_exit_popup)
         self.layout.add_widget(exit_button)
 
+        self.clear_widgets()
         self.add_widget(self.layout)
-
 
     def add_back_card_button(self, pos_hint):
         """Adds a permanent back card button on the left for flipping to the next card."""
         back_card_button = ImageButton(source='assets/back_card.jpg', size_hint=(0.30, 0.30), pos_hint=pos_hint)
-        back_card_button.bind(on_press=self.flip_to_next_card)
         self.layout.add_widget(back_card_button)
         return back_card_button
 
@@ -385,27 +402,6 @@ class GameScreen(BaseScreen):
                 # Make the right back card disappear after the first card flip
                 self.card_image_2.opacity = 1  # Make it invisible
         
-        else:
-            print("No more cards left to flip.")
-            self.display_scores()
-
-    def flip_to_next_card(self, instance):
-        """Flip the right card to reveal the next card in the sequence."""
-        # Ensure there is a card to display
-        if self.current_card_index < len(self.cards) - 1:
-            # Get the next card in the list
-            new_card = self.cards[self.current_card_index + 1]
-            
-            # Call the animate_card_flip function with the correct arguments
-            self.animate_card_flip(self.card_image_2, self.current_card, new_card)
-            
-            # Update current_card and increment the card index
-            self.current_card = new_card
-            self.current_card_index += 1
-
-            self.update_card_indicator()  # Update the card count indicator
-            self.cards_left_label.text = f"Cards Left: {len(self.cards) - self.current_card_index - 1}"
-
         else:
             print("No more cards left to flip.")
             self.display_scores()
@@ -610,13 +606,20 @@ class GameScreen(BaseScreen):
             else:
                 print(f"Player {player_id + 1} selected the wrong item!")
 
-        # Increase the index to fetch the next card if available
-        if self.current_card_index < len(self.cards) - 1:
-            self.current_card_index += 1
-            self.current_card = self.cards[self.current_card_index]
-            self.current_card['used'] = True  # Mark this card as used
-            # Trigger the card flip animation with the next card
-            self.animate_card_flip(self.card_image_2, self.current_card, self.current_card)
+        # Check if there are unused cards remaining
+        unused_cards = [card for card in self.cards if not card['used']]
+        if unused_cards:
+            # Shuffle unused cards and select the next card
+            random.shuffle(unused_cards)
+            new_card = unused_cards[0]
+            
+            # Mark the new card as used
+            new_card['used'] = True
+            self.current_card = new_card  # Set the current card to the new one
+            self.current_card_index += 1  # Increment the card index
+
+            # Trigger the card flip animation with the new card
+            self.animate_card_flip(self.card_image_2, self.current_card, new_card)
         else:
             print("No Cards Remaining!")
             self.display_scores()  # Display final scores when the game ends
