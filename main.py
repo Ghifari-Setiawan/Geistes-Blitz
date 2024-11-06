@@ -355,6 +355,11 @@ class GameScreen(BaseScreen):
                                       font_size=24, font_name='assets/fonts/CreteRound-Regular.ttf', pos_hint={'center_x': 0.5, 'center_y': 0.7})
         self.layout.add_widget(self.cards_left_label)
 
+        if self.card_image_2.source == 'assets/back_card.jpg':
+            self.start_label = Label(text="Press any item to start!",
+                                    font_size=24, font_name='assets/fonts/CreteRound-Regular.ttf', pos_hint={'center_x': 0.5, 'center_y': 0.64})
+            self.layout.add_widget(self.start_label)
+
         exit_button = ImageButton(source='assets/exit_icon_button.png', size_hint=(None, None), size=(64, 64),
                                   pos_hint={'center_x': 0.5, 'center_y': 0.30})
         exit_button.bind(on_press=self.show_exit_popup)
@@ -407,6 +412,9 @@ class GameScreen(BaseScreen):
             self.display_scores()
 
     def animate_card_flip(self, card_image, current_card, new_card):
+        if hasattr(self, 'start_label') and self.start_label in self.layout.children:
+            self.layout.remove_widget(self.start_label)
+            
         if self.current_card_index == -1:
             # Set initial flip
             self.current_card_index = 0
