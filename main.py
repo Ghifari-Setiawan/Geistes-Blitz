@@ -592,21 +592,36 @@ class GameScreen(BaseScreen):
         # Shuffle the cards to ensure random order
         random.shuffle(cards)
         return cards
+    
+    def show_feedback_popup(self, message, player_id):
+        """Displays a pop-up with feedback message."""
+        content = Label(text=message, font_size=20)
+        popup = Popup(
+            title=f"Player {player_id + 1}", 
+            content=content,
+            size_hint=(None, None), 
+            size=(300, 200),
+            auto_dismiss=False
+        )
+        popup.open()
+
+        # Schedule the pop-up to dismiss after 2 seconds
+        Clock.schedule_once(lambda dt: popup.dismiss(), 2)
 
     def handle_item_selection(self, selected_item, player_id):
         # Check if the selected item is correct based on the card's level
         if self.current_card['level'] == 1:
             if selected_item['name'] == self.current_card['correct_item']:
-                self.scores[player_id] += 1  # Increase score for the player who selected the correct item
-                print(f"Player {player_id + 1} selected the correct item! Their score is now {self.scores[player_id]}.")
+                self.scores[player_id] += 1
+                message = f"Correct! Player {player_id + 1} scores."
             else:
-                print(f"Player {player_id + 1} selected the wrong item!")
+                message = f"Wrong! Player {player_id + 1} missed it."
         elif self.current_card['level'] == 2:
             if selected_item['name'] == self.current_card['incorrect_item']:
                 self.scores[player_id] += 1
-                print(f"Player {player_id + 1} selected the correct item! Their score is now {self.scores[player_id]}.")
+                message = f"Correct! Player {player_id + 1} scores."
             else:
-                print(f"Player {player_id + 1} selected the wrong item!")
+                message = f"Wrong! Player {player_id + 1} missed it."
 
         # Check if there are unused cards remaining
         unused_cards = [card for card in self.cards if not card['used']]
@@ -631,6 +646,9 @@ class GameScreen(BaseScreen):
         self.cards_left_label.text = f"Cards Left: {len(self.cards) - self.current_card_index - 1}"
         self.update_player_labels_and_scores()
 
+        # Show the feedback pop-up
+        if self.current_card_index > 0:
+            self.show_feedback_popup(message, player_id)
 
     def update_card(self):
         """Updates the displayed card image."""
