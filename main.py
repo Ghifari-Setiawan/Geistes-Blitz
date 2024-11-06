@@ -19,7 +19,7 @@ import random
 from kivy.clock import Clock
 
 # Set window size at the start
-Window.size = (2340, 1080)
+Window.size = (1920, 1080)
 
 # Classes for custom widgets like ImageButton
 class ImageButton(ButtonBehavior, Image):
@@ -57,7 +57,6 @@ class MainMenu(BaseScreen):
             size_hint=(0.2, 0.12),
             pos_hint={'center_x': 0.5, 'center_y': 0.4},
             background_normal='assets/start.png',  # Use your styled button image
-            background_down='assets/start_button_pressed.png',
         )
 
         # Add How to Play button
@@ -65,7 +64,6 @@ class MainMenu(BaseScreen):
             size_hint=(0.3, 0.12),
             pos_hint={'center_x': 0.5, 'center_y': 0.2},
             background_normal='assets/howtoplay.png',  # Styled button image
-            background_down='assets/howtoplay_button_pressed.png',
         )
 
         start_button.bind(on_press=self.start_game)
@@ -83,10 +81,10 @@ class MainMenu(BaseScreen):
         # Create a layout for the popup
         popup_layout = FloatLayout()
 
-        Logger.info("Loading video from: {}".format('./assets/pkl_record.mp4'))
+        Logger.info("Loading video from: {}".format('./assets/placeholder.mp4'))
         
        # Create the video widget and add it to the layout
-        video = VideoPlayer(source='./assets/pkl_record.mp4',
+        video = VideoPlayer(source='./assets/placeholder.mp4',
                         size_hint=(0.9, 0.7), 
                         pos_hint={'center_x': 0.5, 'center_y': 0.6})
 
@@ -135,21 +133,18 @@ class PlayerSelection(BaseScreen):
             size_hint=(0.35, 0.12),
             pos_hint={'center_x': 0.5, 'center_y': 0.55},
             background_normal='assets/2players.png',
-            background_down='assets/2player_button_pressed.png',
         )
         
         three_players_button = Button(
             size_hint=(0.35, 0.12),
             pos_hint={'center_x': 0.5, 'center_y': 0.4},
             background_normal='assets/3players.png',
-            background_down='assets/3player_button_pressed.png',
         )
 
         four_players_button = Button(
             size_hint=(0.35, 0.12),
             pos_hint={'center_x': 0.5, 'center_y': 0.25},
             background_normal='assets/4players.png',
-            background_down='assets/4player_button_pressed.png',
         )
 
         # Bind the button events
@@ -167,7 +162,6 @@ class PlayerSelection(BaseScreen):
             size_hint=(0.15, 0.1),
             pos_hint={'center_x': 0.5, 'center_y': 0.1},
             background_normal='assets/back_button.png',  # Optional back button styling
-            background_down='assets/back_button_pressed.png'
         )
         back_button.bind(on_press=self.go_back)
         layout.add_widget(back_button)
@@ -460,15 +454,15 @@ class GameScreen(BaseScreen):
         elif self.num_player_count == 3:
             positions = [
                 {'center_x': 0.5, 'center_y': 0.17},  # Player 1 (bottom)
-                {'center_x': 0.28, 'center_y': 0.65},  # Player 2 (left)
-                {'center_x': 0.99, 'center_y': 0.65}   # Player 3 (right)
+                {'center_x': 0.25, 'center_y': 0.65},  # Player 2 (left)
+                {'center_x': 0.95, 'center_y': 0.65}   # Player 3 (right)
             ]
         elif self.num_player_count == 4:
             positions = [
                 {'center_x': 0.5, 'center_y': 0.17},  # Player 1 (bottom)
-                {'center_x': 0.3, 'center_y': 0.65},   # Player 2 (left)
+                {'center_x': 0.25, 'center_y': 0.65},   # Player 2 (left)
                 {'center_x': 0.5, 'center_y': 0.80},  # Player 3 (top)
-                {'center_x': 0.96, 'center_y': 0.65}   # Player 4 (right)
+                {'center_x': 0.95, 'center_y': 0.65}   # Player 4 (right)
             ]
         else:
             print(f"Warning: Unsupported number of players ({self.num_player_count}).")
@@ -525,7 +519,7 @@ class GameScreen(BaseScreen):
             print("Permainan sudah dimulai dengan 2 Players!")
             # Player 1 at the bottom, Player 2 at the top
             self.player_labels[0].pos_hint = {'center_x': 0.5, 'center_y': 0.1}  # Centered near the bottom
-            self.score_labels[0].pos_hint = {'center_x': 0.5, 'center_y': 0.06}
+            self.score_labels[0].pos_hint = {'center_x': 0.5, 'center_y': 0.05}
 
             self.player_labels[1].pos_hint = {'center_x': 0.5, 'center_y': 0.95}  # Centered near the top
             self.score_labels[1].pos_hint = {'center_x': 0.5, 'center_y': 0.90}
@@ -534,7 +528,7 @@ class GameScreen(BaseScreen):
             print("Permainan sudah dimulai dengan 3 Players!")
             # Player 1 at the bottom, Player 2 on the left, Player 3 on the right
             self.player_labels[0].pos_hint = {'center_x': 0.5, 'center_y': 0.1}  # Bottom center
-            self.score_labels[0].pos_hint = {'center_x': 0.5, 'center_y': 0.06}
+            self.score_labels[0].pos_hint = {'center_x': 0.5, 'center_y': 0.05}
 
             self.player_labels[1].pos_hint = {'center_x': 0.050, 'center_y': 0.5}  # Left center
             self.score_labels[1].pos_hint = {'center_x': 0.050, 'center_y': 0.45}
@@ -546,7 +540,7 @@ class GameScreen(BaseScreen):
             print("Permainan sudah dimulai dengan 4 Players!")
             # Player 1 at the bottom, Player 2 on the left, Player 3 on the top, Player 4 on the right
             self.player_labels[0].pos_hint = {'center_x': 0.5, 'center_y': 0.1}  # Bottom center
-            self.score_labels[0].pos_hint = {'center_x': 0.5, 'center_y': 0.06}
+            self.score_labels[0].pos_hint = {'center_x': 0.5, 'center_y': 0.05}
 
             self.player_labels[1].pos_hint = {'center_x': 0.050, 'center_y': 0.5}  # Left center
             self.score_labels[1].pos_hint = {'center_x': 0.050, 'center_y': 0.45}
@@ -554,8 +548,8 @@ class GameScreen(BaseScreen):
             self.player_labels[2].pos_hint = {'center_x': 0.5, 'center_y': 0.95}  # Top center
             self.score_labels[2].pos_hint = {'center_x': 0.5, 'center_y': 0.90}
 
-            self.player_labels[3].pos_hint = {'center_x': 0.95, 'center_y': 0.6}  # Right center
-            self.score_labels[3].pos_hint = {'center_x': 0.95, 'center_y': 0.55}
+            self.player_labels[3].pos_hint = {'center_x': 0.95, 'center_y': 0.5}  # Right center
+            self.score_labels[3].pos_hint = {'center_x': 0.95, 'center_y': 0.45}
 
     def on_item_click(self, selected_item, player_id):
         self.handle_item_selection(selected_item, player_id)
