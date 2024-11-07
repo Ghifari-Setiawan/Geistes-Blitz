@@ -19,7 +19,7 @@ import random
 from kivy.clock import Clock
 
 # Set window size at the start
-Window.size = (1920, 1080)
+Window.size = (2500, 1080)
 
 # Classes for custom widgets like ImageButton
 class ImageButton(ButtonBehavior, Image):
