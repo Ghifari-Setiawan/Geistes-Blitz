@@ -15,11 +15,12 @@ from kivy.core.audio import SoundLoader
 from kivy.animation import Animation
 from kivy.uix.widget import Widget
 from kivy.uix.boxlayout import BoxLayout
+from kivy.resources import resource_find
 import random
 from kivy.clock import Clock
 
 # Set window size at the start
-Window.size = (2500, 1080)
+Window.size = (2340, 1080)
 
 # Classes for custom widgets like ImageButton
 class ImageButton(ButtonBehavior, Image):
@@ -80,13 +81,10 @@ class MainMenu(BaseScreen):
     def show_instructions(self, instance):
         # Create a layout for the popup
         popup_layout = FloatLayout()
-
-        Logger.info("Loading video from: {}".format('./assets/placeholder.mp4'))
         
        # Create the video widget and add it to the layout
-        video = VideoPlayer(source='./assets/placeholder.mp4',
-                        size_hint=(0.9, 0.7), 
-                        pos_hint={'center_x': 0.5, 'center_y': 0.6})
+        video_path = resource_find('./assets/placeholder.mp4')
+        video = VideoPlayer(source=video_path, size_hint=(0.9, 0.7), pos_hint={'center_x': 0.5, 'center_y': 0.6})
 
         # Ensure the video starts in play mode
         video.state = 'play'
