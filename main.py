@@ -313,7 +313,7 @@ class GameScreen(BaseScreen):
         if len(self.player_labels) == self.num_player_count:
             self.update_player_labels_and_scores()
         
-        self.cards_left_label.text = f"Cards Left: {len(self.cards) - 1}"  # Update initial count
+        self.cards_left_label.text = f"Cards Left: {len(self.cards)}"  # Update initial count
         self.update_player_labels_and_scores()
 
     def create_game_layout(self):
@@ -349,7 +349,7 @@ class GameScreen(BaseScreen):
                                       font_size=24, font_name='assets/fonts/CreteRound-Regular.ttf', pos_hint={'center_x': 0.5, 'center_y': 0.7})
         self.layout.add_widget(self.cards_left_label)
 
-        if self.card_image_2.source == 'assets/back_card.jpg':
+        if self.current_card_index == -1 :
             self.start_label = Label(text="Press any item to start!",
                                     font_size=24, font_name='assets/fonts/CreteRound-Regular.ttf', pos_hint={'center_x': 0.5, 'center_y': 0.64})
             self.layout.add_widget(self.start_label)
@@ -375,14 +375,6 @@ class GameScreen(BaseScreen):
         self.layout.add_widget(card_image)
         return card_image
 
-    def card_clicked(self, instance, card):
-        """Method called when the card is clicked, triggering a flip animation."""
-        print("Card clicked!")
-
-        # Trigger the card flip animation
-        self.animate_card_flip(instance, card)
-        self.update_next_card()
-
     def update_next_card(self):
         """Moves to the next card."""
         self.current_card_index += 1  # Increment the current card index
@@ -406,10 +398,8 @@ class GameScreen(BaseScreen):
             self.display_scores()
 
     def animate_card_flip(self, card_image, current_card, new_card):
-        if hasattr(self, 'start_label') and self.start_label in self.layout.children:
-            self.layout.remove_widget(self.start_label)
             
-        if self.current_card_index == -1:
+        if self.current_card_index == 0:
             # Set initial flip
             self.current_card_index = 0
             card_image.source = new_card['image']
@@ -609,7 +599,17 @@ class GameScreen(BaseScreen):
         Clock.schedule_once(lambda dt: popup.dismiss(), 2)
 
     def handle_item_selection(self, selected_item, player_id):
+        if hasattr(self, 'start_label') and self.start_label in self.layout.children:
+            self.layout.remove_widget(self.start_label)
+
         # Check if the selected item is correct based on the card's level
+        
+        if self.current_card_index == -1:
+            # Load the first card without checking correctness
+            self.update_next_card()
+            print("Game started!")
+            return
+
         if self.current_card['level'] == 1:
             if selected_item['name'] == self.current_card['correct_item']:
                 self.scores[player_id] += 1
@@ -643,7 +643,7 @@ class GameScreen(BaseScreen):
             return
 
         # Update the 'Cards Left' label
-        self.cards_left_label.text = f"Cards Left: {len(self.cards) - self.current_card_index - 1}"
+        self.cards_left_label.text = f"Cards Left: {len(self.cards) - self.current_card_index}"
         self.update_player_labels_and_scores()
 
         # Show the feedback pop-up
@@ -666,7 +666,7 @@ class GameScreen(BaseScreen):
             cards_left = 0
 
         # Update the label text to reflect the cards left
-        self.cards_left_label.text = f"Cards Left: {cards_left}"
+        self.cards_left_label.text = f"Cards Left: {len(self.cards)}"
 
     def display_scores(self):
         """Displays the final scores when the game ends with options to restart or return to the main menu."""
