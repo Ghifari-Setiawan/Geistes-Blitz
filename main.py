@@ -18,7 +18,6 @@ from kivy.uix.boxlayout import BoxLayout
 from kivy.resources import resource_find
 import random
 from kivy.clock import Clock
-import ffpyplayer
 
 # Set window size at the start
 Window.size = (2340, 1080)
@@ -84,7 +83,7 @@ class MainMenu(BaseScreen):
         popup_layout = FloatLayout()
         
        # Create the video widget and add it to the layout
-        video_path = resource_find('./assets/placeholder.mp4')
+        video_path = resource_find('./assets/test_htp.mp4')
         video = VideoPlayer(source=video_path, size_hint=(0.9, 0.7), pos_hint={'center_x': 0.5, 'center_y': 0.6})
 
         # Ensure the video starts in play mode
