@@ -8,20 +8,16 @@ from kivy.uix.screenmanager import ScreenManager, Screen
 from kivy.uix.label import Label
 from kivy.uix.gridlayout import GridLayout
 from kivy.core.window import Window
-from kivy.logger import Logger
 from kivy.uix.behaviors import ButtonBehavior
-from kivy.uix.videoplayer import VideoPlayer
-from kivy.core.audio import SoundLoader
 from kivy.animation import Animation
 from kivy.uix.widget import Widget
 from kivy.uix.boxlayout import BoxLayout
-from kivy.resources import resource_find
 import random
 from kivy.clock import Clock
-import ffpyplayer
 from kivy.uix.image import Image
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.scrollview import ScrollView
+
 # Set window size at the start
 Window.size = (2340, 1080)
 
@@ -83,27 +79,34 @@ class MainMenu(BaseScreen):
 
     def show_instructions(self, instance):
         # Create a layout for the scrollable content
-        content_layout = GridLayout(cols=1, spacing=10, size_hint_y=None)
+        content_layout = GridLayout(cols=1, spacing=15, size_hint_y=None)
         content_layout.bind(minimum_height=content_layout.setter('height'))
 
         # List of image sources and descriptions
         images_and_labels = [
-            ('assets/howtoplay/welcome geistes blits.png', "1. Selamat Datang di Geistes Blitz! Tekan start untuk memulai permainan."),
-            ('assets/howtoplay/select player geistes blits.png', "2. Pilih Jumlah Pemain! Pilih jumlah permain sesuai yang ingin di mainkan."),
-            ('assets/howtoplay/bagian permainan awal.png', "3. Bagian Permainan Awal! Tekan items untuk membuka kartu pertama, kartu selanjutnya terbuka secara otomatis danacak"),
-            ('assets/howtoplay/pemilihan untuk kartu level 1.png', "4. Pemilihan Kartu Level 1! Kartu Level 1 berupa kartu yang berisi gambar dari items yang sesuai dengan bentuk dan warna dari Items tersebut."),
-            ('assets/howtoplay/pemilihan untuk kartu level 2.png', "5. Pemilihan Kartu Level 2! Kartu Level 2 berupa kartu yang berisi gambar dari items dengan bentuk dan warna yang tidak seharusnya dari items tersebut. "),
-            ('assets/howtoplay/selesai permainan.png', "6. Permainan Selesai!memperlihatkan urutan pemenang dan jumlah poin yang mereka dapatkan")
+            ('assets/howtoplay/welcome geistes blits.png', "1. Selamat Datang di Geistes Blitz!\nTekan Start untuk memulai permainan."),
+            ('assets/howtoplay/select player geistes blits.png', "2. Pilih Jumlah Pemain!\nPilih jumlah permain sesuai yang ingin dimainkan."),
+            ('assets/howtoplay/bagian permainan awal.png', "3. Bagian Permainan Awal!\nTekan salah satu items untuk membuka kartu pertama.\nSetiap kali menekan items, kartu selanjutnya akan terbuka secara otomatis dan acak."),
+            ('assets/howtoplay/pemilihan untuk kartu level 1.png', "4. Pemilihan Kartu Level 1!\nKartu Level 1 berupa kartu yang berisi gambar dari items yang sesuai dengan bentuk dan warna dari items tersebut."),
+            ('assets/howtoplay/pemilihan untuk kartu level 2.png', "5. Pemilihan Kartu Level 2! \nKartu Level 2 berupa kartu yang berisi gambar dari items dengan bentuk dan warna yang tidak seharusnya dari items tersebut. "),
+            ('assets/howtoplay/selesai permainan.png', "6. Permainan Selesai!\nLihat hasil permainan pada popup yang muncul, tekan Restart Game untuk memulai kembali permainan!")
         ]
 
         # Add each image and its label to the layout
         for img_src, description in images_and_labels:
-            # Add label with smaller font size
-            label = Label(text=description, font_size='12sp', size_hint_y=None, height=30)
+            label = Label(
+                text=description,
+                font_size='18sp',
+                font_name='assets/fonts/CreteRound-Regular.ttf',
+                size_hint_y=None,
+                height=80,
+                halign='center',
+                valign='middle',
+            )
             content_layout.add_widget(label)
 
             # Add image with defined size
-            image = Image(source=img_src, size_hint_y=None, height=200)
+            image = Image(source=img_src, size_hint_y=None, height=350)
             content_layout.add_widget(image)
 
         # Wrap the content layout in a scroll view
@@ -385,25 +388,23 @@ class GameScreen(BaseScreen):
         return card_image
 
     def update_next_card(self):
-        """Moves to the next card."""
-        self.current_card_index += 1  # Increment the current card index
-
-        # Check if there are remaining cards
-        if self.current_card_index < len(self.cards):
-            # Update the current card object
-            self.current_card = self.cards[self.current_card_index]
-            
-            # Check if the second card is visible (right side back card)
-            if not self.is_second_card_visible:
-                # Show the actual card on the right and hide the back card
-                self.card_image_2.source = self.current_card['image']
-                self.is_second_card_visible = True
-            else:
-                # Make the right back card disappear after the first card flip
-                self.card_image_2.opacity = 1  # Make it invisible
+        """Updates to the next unused card if available, and triggers card flip animation."""
+        unused_cards = [card for card in self.cards if not card['used']]
         
+        if unused_cards:
+            # Select and mark the next card as used
+            new_card = unused_cards[0]
+            new_card['used'] = True
+            self.current_card = new_card  # Update the current card to the new one
+            self.current_card_index += 1  # Increment the card index
+
+            # Trigger the card flip animation
+            self.animate_card_flip(self.card_image_2, self.current_card, new_card)
+            
+            # Update the 'Cards Left' label
+            self.cards_left_label.text = f"Cards Left: {len(unused_cards)}"
         else:
-            print("No more cards left to flip.")
+            print("No Cards Remaining!")
             self.display_scores()
 
     def animate_card_flip(self, card_image, current_card, new_card):
@@ -605,59 +606,43 @@ class GameScreen(BaseScreen):
         popup.open()
 
         # Schedule the pop-up to dismiss after 2 seconds
-        Clock.schedule_once(lambda dt: popup.dismiss(), 2)
+        Clock.schedule_once(lambda dt: popup.dismiss(), 1)
 
     def handle_item_selection(self, selected_item, player_id):
         if hasattr(self, 'start_label') and self.start_label in self.layout.children:
             self.layout.remove_widget(self.start_label)
 
-        # Check if the selected item is correct based on the card's level
-        
+        # Start the game with the first card if it's the first item selection
         if self.current_card_index == -1:
-            # Load the first card without checking correctness
             self.update_next_card()
             print("Game started!")
             return
 
+        # Determine feedback message based on correctness
         if self.current_card['level'] == 1:
             if selected_item['name'] == self.current_card['correct_item']:
                 self.scores[player_id] += 1
                 message = f"Correct! Player {player_id + 1} scores."
+                # Move to the next card if the answer is correct
+                self.update_next_card()
             else:
                 message = f"Wrong! Player {player_id + 1} missed it."
+                # Stay on the current card
         elif self.current_card['level'] == 2:
             if selected_item['name'] == self.current_card['incorrect_item']:
                 self.scores[player_id] += 1
                 message = f"Correct! Player {player_id + 1} scores."
+                # Move to the next card if the answer is correct
+                self.update_next_card()
             else:
                 message = f"Wrong! Player {player_id + 1} missed it."
+                # Stay on the current card
 
-        # Check if there are unused cards remaining
-        unused_cards = [card for card in self.cards if not card['used']]
-        if unused_cards:
-            # Shuffle unused cards and select the next card
-            random.shuffle(unused_cards)
-            new_card = unused_cards[0]
-            
-            # Mark the new card as used
-            new_card['used'] = True
-            self.current_card = new_card  # Set the current card to the new one
-            self.current_card_index += 1  # Increment the card index
+        # Show feedback popup with the message
+        self.show_feedback_popup(message, player_id)
 
-            # Trigger the card flip animation with the new card
-            self.animate_card_flip(self.card_image_2, self.current_card, new_card)
-        else:
-            print("No Cards Remaining!")
-            self.display_scores()  # Display final scores when the game ends
-            return
-
-        # Update the 'Cards Left' label
-        self.cards_left_label.text = f"Cards Left: {len(self.cards) - self.current_card_index}"
+        # Update player labels and scores after selection
         self.update_player_labels_and_scores()
-
-        # Show the feedback pop-up
-        if self.current_card_index > 0:
-            self.show_feedback_popup(message, player_id)
 
     def update_card(self):
         """Updates the displayed card image."""
