@@ -18,6 +18,7 @@ from kivy.uix.boxlayout import BoxLayout
 from kivy.resources import resource_find
 import random
 from kivy.clock import Clock
+import ffpyplayer
 
 # Set window size at the start
 Window.size = (2340, 1080)
