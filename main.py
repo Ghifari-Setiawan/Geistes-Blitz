@@ -19,7 +19,9 @@ from kivy.resources import resource_find
 import random
 from kivy.clock import Clock
 import ffpyplayer
-
+from kivy.uix.image import Image
+from kivy.uix.boxlayout import BoxLayout
+from kivy.uix.scrollview import ScrollView
 # Set window size at the start
 Window.size = (2340, 1080)
 
@@ -80,40 +82,48 @@ class MainMenu(BaseScreen):
         self.manager.current = 'player_selection'
 
     def show_instructions(self, instance):
-        # Create a layout for the popup
-        popup_layout = FloatLayout()
-        
-       # Create the video widget and add it to the layout
-        video_path = resource_find('./assets/test_htp.mp4')
-        video = VideoPlayer(source=video_path, size_hint=(0.9, 0.7), pos_hint={'center_x': 0.5, 'center_y': 0.6})
+        # Create a layout for the scrollable content
+        content_layout = GridLayout(cols=1, spacing=10, size_hint_y=None)
+        content_layout.bind(minimum_height=content_layout.setter('height'))
 
-        # Ensure the video starts in play mode
-        video.state = 'play'
-        
-        # Loop the video when it ends
-        video.options = {'eos': 'loop'}
+        # List of image sources and descriptions
+        images_and_labels = [
+            ('assets/howtoplay/welcome geistes blits.png', "1. Selamat Datang di Geistes Blitz! Tekan start untuk memulai permainan."),
+            ('assets/howtoplay/select player geistes blits.png', "2. Pilih Jumlah Pemain! Pilih jumlah permain sesuai yang ingin di mainkan."),
+            ('assets/howtoplay/bagian permainan awal.png', "3. Bagian Permainan Awal! Tekan items untuk membuka kartu pertama, kartu selanjutnya terbuka secara otomatis danacak"),
+            ('assets/howtoplay/pemilihan untuk kartu level 1.png', "4. Pemilihan Kartu Level 1! Kartu Level 1 berupa kartu yang berisi gambar dari items yang sesuai dengan bentuk dan warna dari Items tersebut."),
+            ('assets/howtoplay/pemilihan untuk kartu level 2.png', "5. Pemilihan Kartu Level 2! Kartu Level 2 berupa kartu yang berisi gambar dari items dengan bentuk dan warna yang tidak seharusnya dari items tersebut. "),
+            ('assets/howtoplay/selesai permainan.png', "6. Permainan Selesai!memperlihatkan urutan pemenang dan jumlah poin yang mereka dapatkan")
+        ]
 
-        # Allow the video to stretch to fit the layout
-        video.allow_stretch = True
+        # Add each image and its label to the layout
+        for img_src, description in images_and_labels:
+            # Add label with smaller font size
+            label = Label(text=description, font_size='12sp', size_hint_y=None, height=30)
+            content_layout.add_widget(label)
 
-        # Add the video player to the popup layout
-        popup_layout.add_widget(video)
+            # Add image with defined size
+            image = Image(source=img_src, size_hint_y=None, height=200)
+            content_layout.add_widget(image)
 
-        # Create a close button to dismiss the popup
+        # Wrap the content layout in a scroll view
+        scroll_view = ScrollView(size_hint=(1, 1))
+        scroll_view.add_widget(content_layout)
+
+        # Create a main layout for the popup
+        popup_layout = BoxLayout(orientation='vertical')
+        popup_layout.add_widget(scroll_view)
+
+        # Add a close button at the bottom
         close_button = Button(text="Close", size_hint=(0.2, 0.1), pos_hint={'center_x': 0.5, 'center_y': 0.1})
         popup_layout.add_widget(close_button)
 
-        # Create a popup to show the video
+        # Create and show the popup
         popup = Popup(title='How to Play', content=popup_layout, size_hint=(0.8, 0.8))
 
-        # Bind the close button and stop the video when closing the popup
-        def close_popup(instance):
-            video.state = 'stop'  # Stop the video when the popup is closed
-            popup.dismiss()
+        # Bind the close button to close the popup
+        close_button.bind(on_press=popup.dismiss)
 
-        close_button.bind(on_press=close_popup)
-
-        # Open the popup
         popup.open()
 
 # Player selection screen
