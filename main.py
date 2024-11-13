@@ -79,7 +79,7 @@ class MainMenu(BaseScreen):
 
     def show_instructions(self, instance):
         # Create a layout for the scrollable content
-        content_layout = GridLayout(cols=1, spacing=30, size_hint_y=None)
+        content_layout = GridLayout(cols=1, spacing=50, size_hint_y=None)
         content_layout.bind(minimum_height=content_layout.setter('height'))
 
         # List of image sources and descriptions
@@ -122,7 +122,7 @@ class MainMenu(BaseScreen):
         popup_layout.add_widget(close_button)
 
         # Create and show the popup
-        popup = Popup(title='How to Play', content=popup_layout, size_hint=(0.8, 0.8))
+        popup = Popup(title='How to Play', content=popup_layout, size_hint=(0.8, 0.95))
 
         # Bind the close button to close the popup
         close_button.bind(on_press=popup.dismiss)
