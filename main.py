@@ -84,12 +84,12 @@ class MainMenu(BaseScreen):
 
         # List of image sources and descriptions
         images_and_labels = [
-            ('assets/howtoplay/welcome geistes blits.png', "1. Selamat Datang di Geistes Blitz!\nTekan Start untuk memulai permainan."),
-            ('assets/howtoplay/select player geistes blits.png', "2. Pilih Jumlah Pemain!\nPilih jumlah permain sesuai yang ingin dimainkan."),
-            ('assets/howtoplay/bagian permainan awal.png', "3. Bagian Permainan Awal!\nTekan salah satu items untuk membuka kartu pertama.\nSetiap kali menekan items, kartu selanjutnya akan terbuka secara otomatis dan acak."),
-            ('assets/howtoplay/pemilihan untuk kartu level 1.png', "4. Pemilihan Kartu Level 1!\nKartu Level 1 berupa kartu yang berisi gambar dari items yang sesuai dengan bentuk dan warna dari items tersebut."),
-            ('assets/howtoplay/pemilihan untuk kartu level 2.png', "5. Pemilihan Kartu Level 2! \nKartu Level 2 berupa kartu yang berisi gambar dari items dengan bentuk dan warna yang tidak seharusnya dari items tersebut. "),
-            ('assets/howtoplay/selesai permainan.png', "6. Permainan Selesai!\nLihat hasil permainan pada popup yang muncul, tekan Restart Game untuk memulai kembali permainan!")
+            ('assets/howtoplay/welcome geistes blits.png', "1. Selamat Datang di Geistes Blitz\nTekan Start untuk memulai permainan!"),
+            ('assets/howtoplay/select player geistes blits.png', "2. Pilih Jumlah Pemain\nPilih jumlah permain sesuai yang ingin dimainkan!"),
+            ('assets/howtoplay/bagian permainan awal.png', "3. Bagian Permainan Awal\nTekan salah satu items untuk membuka kartu pertama!\nSetiap kali menekan items, kartu selanjutnya akan terbuka secara otomatis dan acak."),
+            ('assets/howtoplay/pemilihan untuk kartu level 1.png', "4. Pemilihan Kartu Level 1\nKartu Level 1 berupa kartu yang berisi gambar dari items yang sesuai\ndengan bentuk dan warna dari items tersebut.\nJawablah dengan item dan warna yang sesuai dengan kartu tersebut!"),
+            ('assets/howtoplay/pemilihan untuk kartu level 2.png', "5. Pemilihan Kartu Level 2\nKartu Level 2 berupa kartu yang berisi gambar dari items dengan bentuk dan warna\nyang tidak seharusnya dari items tersebut.\nJawablah dengan item dan warna yang tidak muncul pada kartu tersebut!"),
+            ('assets/howtoplay/selesai permainan.png', "6. Permainan Selesai\nLihat hasil permainan pada popup yang muncul.\nTekan Restart Game untuk memulai kembali permainan!")
         ]
 
         # Add each image and its label to the layout
