@@ -79,7 +79,7 @@ class MainMenu(BaseScreen):
 
     def show_instructions(self, instance):
         # Create a layout for the scrollable content
-        content_layout = GridLayout(cols=1, spacing=15, size_hint_y=None)
+        content_layout = GridLayout(cols=1, spacing=30, size_hint_y=None)
         content_layout.bind(minimum_height=content_layout.setter('height'))
 
         # List of image sources and descriptions
