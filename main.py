@@ -96,10 +96,10 @@ class MainMenu(BaseScreen):
         for img_src, description in images_and_labels:
             label = Label(
                 text=description,
-                font_size='18sp',
+                font_size='14sp',
                 font_name='assets/fonts/CreteRound-Regular.ttf',
                 size_hint_y=None,
-                height=80,
+                height=100,
                 halign='center',
                 valign='middle',
             )
@@ -237,39 +237,6 @@ class GameOverScreen(Screen):
         self.layout = FloatLayout()  # Gunakan FloatLayout agar widget bisa bergerak
         self.add_widget(self.layout)
 
-    def on_pre_enter(self):
-        print("Game Over Screen entered")  # Memastikan layar Game Over muncul
-        self.trigger_confetti_animation()  # Memicu animasi confetti saat layar Game Over muncul
-
-    def trigger_confetti_animation(self):
-        for _ in range(50):  # Membuat 50 confetti
-            confetti = Confetti()
-            self.layout.add_widget(confetti)
-            confetti.animate()
-
-
-class Confetti(Widget):
-    def __init__(self, **kwargs):
-        super(Confetti, self).__init__(**kwargs)
-        self.image = Image(source="assets/confetti_new.png", size_hint=(None, None), size=(30, 30))
-        self.add_widget(self.image)
-        # Mulai dari posisi acak di bagian atas layar
-        self.image.pos = (Window.width // 2, Window.height - 50)
-
-
-    def animate(self):
-        # Animasikan confetti jatuh ke bawah
-        end_pos = (self.image.x, 9)
-        anim = Animation(pos=end_pos, duration=3, t='out_bounce')  # Durasi lebih panjang agar terlihat
-        anim.bind(on_complete=self.remove_confetti)
-        anim.start(self.image)
-
-    def remove_confetti(self, *args):
-        # Menghapus confetti setelah sampai di bawah
-        if self.parent:
-            self.parent.remove_widget(self)
-
-
 class GameApp(App):
     def build(self):
         sm = ScreenManager()
@@ -281,7 +248,7 @@ class GameApp(App):
         Clock.schedule_once(self.show_game_over, 2)
 
     def show_game_over(self, dt):
-        # Pindah ke layar Game Over dan memicu animasi confetti
+        # Pindah ke layar Game Over
         self.root.current = 'game_over_screen'
 
 
@@ -448,21 +415,21 @@ class GameScreen(BaseScreen):
         positions = []
         if self.num_player_count == 2:
             positions = [
-                {'center_x': 0.5, 'center_y': 0.17},  # Player 1 (bottom)
-                {'center_x': 0.5, 'center_y': 0.80}   # Player 2 (top)
+                {'center_x': 0.45, 'center_y': 0.17},  # Player 1 (bottom)
+                {'center_x': 0.45, 'center_y': 0.80}   # Player 2 (top)
             ]
         elif self.num_player_count == 3:
             positions = [
-                {'center_x': 0.5, 'center_y': 0.17},  # Player 1 (bottom)
-                {'center_x': 0.25, 'center_y': 0.65},  # Player 2 (left)
-                {'center_x': 0.95, 'center_y': 0.65}   # Player 3 (right)
+                {'center_x': 0.45, 'center_y': 0.17},  # Player 1 (bottom)
+                {'center_x': 0.25, 'center_y': 0.75},  # Player 2 (left)
+                {'center_x': 0.95, 'center_y': 0.75}   # Player 3 (right)
             ]
         elif self.num_player_count == 4:
             positions = [
-                {'center_x': 0.5, 'center_y': 0.17},  # Player 1 (bottom)
-                {'center_x': 0.25, 'center_y': 0.65},   # Player 2 (left)
-                {'center_x': 0.5, 'center_y': 0.80},  # Player 3 (top)
-                {'center_x': 0.95, 'center_y': 0.65}   # Player 4 (right)
+                {'center_x': 0.45, 'center_y': 0.17},  # Player 1 (bottom)
+                {'center_x': 0.25, 'center_y': 0.75},   # Player 2 (left)
+                {'center_x': 0.45, 'center_y': 0.80},  # Player 3 (top)
+                {'center_x': 0.95, 'center_y': 0.75}   # Player 4 (right)
             ]
         else:
             print(f"Warning: Unsupported number of players ({self.num_player_count}).")
@@ -473,19 +440,19 @@ class GameScreen(BaseScreen):
         # Create buttons for each player
         for i in range(self.num_player_count):
             if self.num_player_count == 2:
-                button_layout = GridLayout(cols=5, size_hint=(None, None), width=450, height=100, spacing=30)
+                button_layout = GridLayout(cols=5, size_hint=(None, None), width=450, height=100, spacing=70)
                 
             elif self.num_player_count == 3: 
-                button_layout = GridLayout(cols=5 if i % 3 == 0 else 1, size_hint=(None, None), width=450, height=100, spacing=30)
+                button_layout = GridLayout(cols=5 if i % 3 == 0 else 1, size_hint=(None, None), width=450, height=100, spacing=70)
                 
             elif self.num_player_count == 4:
-                button_layout = GridLayout(cols=5 if i % 2 == 0 else 1, size_hint=(None, None), width=450, height=100,spacing=30)
+                button_layout = GridLayout(cols=5 if i % 2 == 0 else 1, size_hint=(None, None), width=450, height=100,spacing=70)
                 
             for item in items:
                 item_button = Button(
                     background_normal=item['image'],  # Ensure this path is correct
                     size_hint=(None, None),
-                    size=(80, 70),
+                    size=(80, 80),
                     on_press=lambda btn, item=item, player_id=i: self.on_item_click(item, player_id)
                 )
                 button_layout.add_widget(item_button)
@@ -578,7 +545,7 @@ class GameScreen(BaseScreen):
             {'image': 'assets/level1/card9.jpg', 'correct_item': 'Sofa', 'incorrect_item': None, 'level': 1, 'used': False},
             {'image': 'assets/level1/card10.jpg', 'correct_item': 'Ghost', 'incorrect_item': None, 'level': 1, 'used': False},
             {'image': 'assets/level2/card11.jpg', 'correct_item': None, 'incorrect_item': 'Sofa', 'level': 2, 'used': False},
-            {'image': 'assets/level2/card12.jpg', 'correct_item': None, 'incorrect_item': 'Bottle', 'level': 2, 'used': False},
+            {'image': 'assets/level2/card12.jpg', 'correct_item': None, 'incorrect_item': 'Sofa', 'level': 2, 'used': False},
             {'image': 'assets/level2/card13.jpg', 'correct_item': None, 'incorrect_item': 'Mouse', 'level': 2, 'used': False},
             {'image': 'assets/level2/card14.jpg', 'correct_item': None, 'incorrect_item': 'Bottle', 'level': 2, 'used': False},
             {'image': 'assets/level2/card15.jpg', 'correct_item': None, 'incorrect_item': 'Mouse', 'level': 2, 'used': False},
@@ -684,7 +651,7 @@ class GameScreen(BaseScreen):
         box_layout.add_widget(main_menu_button)
 
         # Create and open the popup
-        popup = Popup(title='Game Over', content=box_layout, size_hint=(0.6, 0.6))
+        popup = Popup(title='Game Over', content=box_layout, size_hint=(0.6, 0.6), auto_dismiss=False)
         popup.open()
 
     def show_exit_popup(self, instance):
